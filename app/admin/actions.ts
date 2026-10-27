@@ -49,7 +49,7 @@ export async function savePlayer(f: FormData) {
   const data = {
     slug, name: str(f, "name"), title: str(f, "title"), country: str(f, "country"), server: str(f, "server"),
     languages: str(f, "languages"), device: str(f, "device"), bio: str(f, "bio"), achievements: str(f, "achievements"),
-    metroTier: str(f, "metroTier"), tiktok: str(f, "tiktok").replace(/^@/, ""), tiktokVideos: str(f, "tiktokVideos"),
+    tiktok: str(f, "tiktok").replace(/^@/, ""), tiktokVideos: str(f, "tiktokVideos"),
     experienceYrs: int(f, "experienceYrs"), classicConqs: int(f, "classicConqs"), ultimateConqs: int(f, "ultimateConqs"),
     completedBase: int(f, "completedBase"), winRate: Math.min(100, int(f, "winRate")), kd: parseFloat(str(f, "kd")) || 0,
     slotsPerSeason: Math.max(1, int(f, "slotsPerSeason") || 8), sort: int(f, "sort"),

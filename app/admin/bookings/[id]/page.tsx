@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { db, decrypt, money, SERVICES, STATUS, type ServiceKey } from "@/lib/core";
+import { db, decrypt, MODES, money, SERVICES, STATUS, type ServiceKey } from "@/lib/core";
 import { StatusPill } from "@/components/StatusPill";
 import { updateBooking } from "../../actions";
 
@@ -19,7 +19,7 @@ export default async function AdminBooking({ params }: { params: Promise<{ id: s
     ["الحارس", b.player.name],
     ["الخدمة", `${SERVICES[b.service as ServiceKey].name} — ${money(b.price)}`],
     ["الموسم", b.season.name],
-    ["الطريقة", b.mode === "DUO" ? "اللعب مع الحارس" : "دخول الحساب"],
+    ["الطريقة", MODES[b.mode] ?? b.mode],
     ["اسم اللاعب / ID", `${b.gameName} — ${b.gameId}`],
     ["السيرفر", b.server],
     ["ملاحظات العميل", b.notes || "—"],
@@ -37,7 +37,7 @@ export default async function AdminBooking({ params }: { params: Promise<{ id: s
           </dl>
         </div>
 
-        {b.mode === "LOGIN" && (
+        {b.credentials && (
           <div className="shard border-ice/30 p-6">
             <h2 className="font-display text-xl text-ice">بيانات الدخول (سرّية)</h2>
             {creds ? (

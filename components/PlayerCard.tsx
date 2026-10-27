@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SERVICES, money, trustScore, type ServiceKey } from "@/lib/core";
+import { byServiceOrder, SERVICE_KEYS, SERVICES, money, trustScore, type ServiceKey } from "@/lib/core";
 import { Avatar, SigilRing, TrustSeal } from "./Art";
 import { Stars, type RatingSummary } from "./Stars";
 
@@ -38,8 +38,8 @@ export default function PlayerCard({ p, taken, rating, delay = 0 }: { p: P; take
 
         <dl className="mt-5 grid grid-cols-4 gap-2 text-center">
           {[
-            ["كونكر كلاسيك", p.classicConqs],
             ["كونكر ألتميت", p.ultimateConqs],
+            ["كونكر كلاسيك", p.classicConqs],
             ["حساب منجز", p.completed],
             ["سنوات خبرة", p.experienceYrs],
           ].map(([k, v]) => (
@@ -73,10 +73,10 @@ export const playerSelect = {
   id: true, slug: true, name: true, title: true, avatar: true, country: true, device: true,
   experienceYrs: true, classicConqs: true, ultimateConqs: true, slotsPerSeason: true, completedBase: true,
   idVerified: true, cleanRecord: true, gameplayReview: true, pledgeSigned: true,
-  services: { where: { enabled: true }, select: { service: true, price: true, days: true } },
+  services: { where: { enabled: true, service: { in: SERVICE_KEYS } }, select: { service: true, price: true, days: true } },
   _count: { select: { bookings: { where: { status: "COMPLETED" } } } },
 } as const;
 
-export function withCompleted<T extends { completedBase: number; _count: { bookings: number } }>(p: T) {
-  return { ...p, completed: p.completedBase + p._count.bookings };
+export function withCompleted<T extends { completedBase: number; _count: { bookings: number }; services: { service: string }[] }>(p: T) {
+  return { ...p, services: [...p.services].sort(byServiceOrder), completed: p.completedBase + p._count.bookings };
 }

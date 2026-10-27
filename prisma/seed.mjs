@@ -31,7 +31,7 @@ if (!(await db.paymentMethod.count())) {
   });
 }
 
-const settings = { whatsapp: "", telegram: "", siteName: "قِمّة" };
+const settings = { whatsapp: "", telegram: "", siteName: "نخبة" };
 for (const [key, value] of Object.entries(settings)) {
   await db.setting.upsert({ where: { key }, update: {}, create: { key, value } });
 }
@@ -55,7 +55,7 @@ for (const [i, p] of demo.entries()) {
       achievements: "كونكر في عدة مواسم متتالية\nبدون أي حظر أو إنذار على الحساب",
       idVerified: true, cleanRecord: true, gameplayReview: true, pledgeSigned: true, verifiedAt: new Date(),
       services: {
-        create: ["CLASSIC", "ULTIMATE", "METRO"]
+        create: ["CLASSIC", "ULTIMATE"]
           .map((service, k) => ({ service, price: prices[k], days: [7, 10, 5][k] }))
           .filter((s) => s.price > 0),
       },

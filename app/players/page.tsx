@@ -2,7 +2,7 @@ import { activeSeason, db, takenSlots, ratings } from "@/lib/core";
 import PlayerCard, { playerSelect, withCompleted } from "@/components/PlayerCard";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "حرّاس القمة — قِمّة" };
+export const metadata = { title: "حرّاس النخبة — نخبة" };
 
 export default async function Players() {
   const season = await activeSeason();

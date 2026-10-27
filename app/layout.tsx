@@ -7,14 +7,15 @@ import { AltitudeGauge, MotionRuntime } from "@/components/Motion";
 import { getUser } from "@/lib/auth";
 import { settings } from "@/lib/core";
 import { logout } from "./actions";
+import Logo from "@/components/Logo";
 
 // One clear typeface everywhere: Cairo — bold for headings, regular for text.
 const kufi = Cairo({ subsets: ["arabic", "latin"], weight: ["600", "700", "800"], variable: "--font-kufi" });
 const plex = Cairo({ subsets: ["arabic", "latin"], weight: ["400", "500", "700"], variable: "--font-plex" });
 
 export const metadata: Metadata = {
-  title: "قِمّة — حرّاس الكونكر",
-  description: "احجز لاعباً محترفاً موثّقاً لرفع حسابك إلى كونكر كلاسيك، كونكر ألتميت أو مترو رويال — لعب نظيف بدون غش وحسابك بأمان.",
+  title: "نخبة | NUKHBA — نخبة لاعبي الكونكر",
+  description: "احجز لاعباً محترفاً موثّقاً لرفع حسابك إلى كونكر ألتميت أو كونكر كلاسيك — لعب نظيف بدون غش وحسابك بأمان.",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -28,12 +29,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         <header className="sticky top-0 z-40 border-b border-white/5 bg-night/60 backdrop-blur-md">
           <nav className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
-            <Link href="/" className="flex items-center gap-2 font-display text-2xl">
-              <svg width="30" height="30" viewBox="0 0 40 40" aria-hidden>
-                <path d="M2 34 L15 14 L21 22 L27 6 L38 34Z" fill="none" stroke="#ffcf6b" strokeWidth="2.5" strokeLinejoin="round" />
-                <circle cx="27" cy="6" r="3" fill="#fff6d6" className="beacon" />
-              </svg>
-              <span className="text-aurora">قِمّة</span>
+            <Link href="/" aria-label="نخبة — الصفحة الرئيسية">
+              <Logo size={40} />
             </Link>
             <div className="ms-auto flex items-center gap-1 text-sm sm:gap-4">
               <Link href="/players" className="px-2 py-1 text-mist hover:text-white">الحرّاس</Link>
@@ -56,7 +53,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <footer className="relative mt-24 border-t border-white/5 bg-night/80">
           <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 text-sm text-mist sm:grid-cols-3">
             <div>
-              <div className="font-display text-xl text-gold">قِمّة</div>
+              <Logo size={34} />
               <p className="mt-2 leading-7">منظومة لتنظيم اللاعبين المحترفين الموثّقين. لا غش، لا برامج خارجية، حسابك بأمان.</p>
             </div>
             <div className="space-y-2">

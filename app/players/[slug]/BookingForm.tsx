@@ -1,14 +1,13 @@
 "use client";
 import { useActionState, useState } from "react";
 import { book } from "@/app/actions";
-import { LOGIN_TYPES } from "@/lib/core-client";
+import { QrGlyph } from "@/components/QrGlyph";
 
 type Svc = { key: string; name: string; price: number; days: number };
 
 export default function BookingForm({ slug, server, services }: { slug: string; server: string; services: Svc[] }) {
   const [state, action, pending] = useActionState(book, null);
   const [svc, setSvc] = useState(services[0]?.key);
-  const [mode, setMode] = useState<"DUO" | "LOGIN">("DUO");
   const chosen = services.find((s) => s.key === svc);
 
   return (
@@ -27,17 +26,6 @@ export default function BookingForm({ slug, server, services }: { slug: string; 
         </div>
       </fieldset>
 
-      <fieldset>
-        <legend className="label">طريقة الصعود</legend>
-        <div className="grid grid-cols-2 gap-2">
-          {([["DUO", "ألعب معه", "الأكثر أماناً"], ["LOGIN", "يدخل حسابي", "أسرع"]] as const).map(([k, t, d]) => (
-            <label key={k} className={`cursor-pointer rounded-xl border p-3 text-center transition ${mode === k ? "border-ice bg-ice/10" : "border-white/10"}`}>
-              <input type="radio" name="mode" value={k} checked={mode === k} onChange={() => setMode(k)} className="sr-only" />
-              <div className="font-display">{t}</div><div className="text-xs text-mist">{d}</div>
-            </label>
-          ))}
-        </div>
-      </fieldset>
 
       <div className="grid grid-cols-2 gap-3">
         <div><label className="label" htmlFor="gameName">الاسم في اللعبة</label><input id="gameName" name="gameName" required className="field" /></div>
@@ -48,17 +36,13 @@ export default function BookingForm({ slug, server, services }: { slug: string; 
         <div><label className="label" htmlFor="contact">واتساب / تيليجرام</label><input id="contact" name="contact" required dir="ltr" className="field" /></div>
       </div>
 
-      {mode === "LOGIN" && (
-        <div className="space-y-3 rounded-xl border border-ice/30 bg-ice/5 p-4">
-          <p className="text-xs leading-6 text-ice">🔒 تُشفَّر هذه البيانات فوراً ولا يراها إلا الإدارة، وتُحذف نهائياً عند الإنجاز أو الإلغاء.</p>
-          <select name="loginType" className="field" defaultValue="">
-            <option value="" disabled>طريقة الدخول</option>
-            {LOGIN_TYPES.map((t) => <option key={t}>{t}</option>)}
-          </select>
-          <input name="loginUser" placeholder="البريد / رقم الهاتف / اسم المستخدم" dir="ltr" className="field" autoComplete="off" />
-          <input name="loginPass" type="password" placeholder="كلمة المرور" dir="ltr" className="field" autoComplete="new-password" />
+      <div className="flex gap-3 rounded-xl border border-gold/30 bg-gold/5 p-4">
+        <QrGlyph />
+        <div className="text-sm leading-7">
+          <p className="font-display text-white">الدخول عبر رمز QR فقط</p>
+          <p className="text-mist">لا نطلب كلمة مرورك أبداً. عند بدء الصعود يرسل لك الحارس رمز QR على واتساب، تمسحه من داخل اللعبة فيدخل حسابك.</p>
         </div>
-      )}
+      </div>
 
       <div><label className="label" htmlFor="notes">ملاحظات (اختياري)</label><textarea id="notes" name="notes" rows={2} className="field" /></div>
 

@@ -6,12 +6,16 @@ export const db = g.db ?? new PrismaClient();
 if (process.env.NODE_ENV !== "production") g.db = db;
 
 export const SERVICES = {
-  CLASSIC: { name: "كونكر كلاسيك", short: "كلاسيك", hue: "gold", blurb: "من أي رانك حتى قمة الكلاسيك — نقاط ثابتة ولعب نظيف." },
   ULTIMATE: { name: "كونكر ألتميت", short: "ألتميت", hue: "violet", blurb: "طور الألتميت رويال بفريق واحد ضد الكل — للمحترفين فقط." },
-  METRO: { name: "مترو رويال", short: "مترو", hue: "cyan", blurb: "رفع رتبة المترو وتجميع العتاد بدون خسارة سلاحك." },
+  CLASSIC: { name: "كونكر كلاسيك", short: "كلاسيك", hue: "gold", blurb: "من أي رانك حتى قمة الكلاسيك — نقاط ثابتة ولعب نظيف." },
+  // No longer offered; kept only so older bookings still show a label.
+  METRO: { name: "مترو رويال", short: "مترو", hue: "cyan", blurb: "" },
 } as const;
 export type ServiceKey = keyof typeof SERVICES;
-export const SERVICE_KEYS = Object.keys(SERVICES) as ServiceKey[];
+// Services that can be booked, in display order.
+export const SERVICE_KEYS: ServiceKey[] = ["ULTIMATE", "CLASSIC"];
+export const byServiceOrder = (a: { service: string }, b: { service: string }) =>
+  SERVICE_KEYS.indexOf(a.service as ServiceKey) - SERVICE_KEYS.indexOf(b.service as ServiceKey);
 
 export const STATUS: Record<string, { label: string; tone: string }> = {
   PENDING_PAYMENT: { label: "بانتظار الدفع", tone: "amber" },
@@ -22,7 +26,9 @@ export const STATUS: Record<string, { label: string; tone: string }> = {
   CANCELLED: { label: "ملغى", tone: "rose" },
 };
 
-export { LOGIN_TYPES } from "./core-client";
+// How the guardian gets into the account. QR is the only method offered now;
+// LOGIN / DUO remain only for older bookings.
+export const MODES: Record<string, string> = { QR: "دخول عبر QR", LOGIN: "دخول بكلمة المرور", DUO: "اللعب مع الحارس" };
 
 // A booking holds a slot unless it is cancelled, or unpaid with no proof after 24h.
 export const HOLD_MS = 24 * 3600 * 1000;

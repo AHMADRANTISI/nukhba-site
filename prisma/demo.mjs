@@ -39,7 +39,7 @@ async function booking(u, slug, service, status, extra = {}, events = []) {
     data: {
       code: `D-${(Date.now() % 1e6).toString(36).toUpperCase()}${n++}`,
       userId: u.id, playerId: p.id, seasonId: season.id, service, price: svc.price, status,
-      mode: "DUO", gameName: "DemoHero", gameId: "5123456789", server: "الشرق الأوسط", contact: "+900000000000",
+      mode: "QR", gameName: "DemoHero", gameId: "5123456789", server: "الشرق الأوسط", contact: "+900000000000",
       createdAt: ago(extra.daysAgo ?? 3), progress: extra.progress ?? 0, adminNote: extra.note ?? "",
       events: { create: events.map((text, i) => ({ text, createdAt: ago((extra.daysAgo ?? 3) - i * 0.6) })) },
     },
@@ -54,7 +54,7 @@ if (!(await db.booking.count({ where: { userId: me.id } }))) {
   await db.review.create({ data: { bookingId: done.id, playerId: done.playerId, userId: me.id, rating: 5, text: "وصلني كونكر قبل الموعد بيومين، وكان يرسل لي تحديثات كل يوم. لعب نظيف 100%." } });
   await booking(me, "saqr", "ULTIMATE", "IN_PROGRESS", { daysAgo: 4, progress: 62, note: "الحارس يلعب يومياً من 8 مساءً حتى 2 فجراً" },
     ["تم حجز المقعد — بانتظار إثبات الدفع خلال 24 ساعة", "تم رفع إثبات الدفع — قيد المراجعة", "الحالة: مؤكد — بانتظار البدء", "الحالة: قيد الصعود", "التقدّم 62%"]);
-  await booking(me, "rawan", "METRO", "PENDING_PAYMENT", { daysAgo: 0.1 }, ["تم حجز المقعد — بانتظار إثبات الدفع خلال 24 ساعة"]);
+  await booking(me, "rawan", "ULTIMATE", "PENDING_PAYMENT", { daysAgo: 0.1 }, ["تم حجز المقعد — بانتظار إثبات الدفع خلال 24 ساعة"]);
   await booking(me, "dhib", "CLASSIC", "COMPLETED", { daysAgo: 20, progress: 100 },
     ["تم حجز المقعد — بانتظار إثبات الدفع خلال 24 ساعة", "الحالة: قيد الصعود", "الحالة: وصل القمة"]);
 }
@@ -64,10 +64,10 @@ const sample = [
   ["خالد", "nimr", "ULTIMATE", 5, "محترف جداً وهادئ، ما خسرت أي نقاط تقريباً."],
   ["يوسف", "nimr", "CLASSIC", 4, "ممتاز، تأخر يوم واحد بس بسبب ضغط الموسم."],
   ["ريم", "saqr", "CLASSIC", 5, "أسرع حارس جربته، وتعامله راقي."],
-  ["عمر", "saqr", "METRO", 5, "رفع المترو وما خسرت سلاحي الذهبي. شكراً!"],
+  ["عمر", "saqr", "ULTIMATE", 5, "وصلت كونكر ألتميت لأول مرة بحياتي. شكراً!"],
   ["مازن", "rawan", "ULTIMATE", 5, "استراتيجيتها بالدائرة الأخيرة شي ثاني."],
   ["سارة", "rawan", "CLASSIC", 4, "تجربة جميلة وتواصل مستمر."],
-  ["حسن", "dhib", "METRO", 5, "ملك المترو بدون منازع."],
+  ["حسن", "dhib", "CLASSIC", 5, "هادئ ومحترف، وصلني بدون أي خسارة نقاط."],
   ["علي", "dhib", "CLASSIC", 3, "وصلت الكونكر لكن أخذ وقت أطول من المتوقع."],
 ];
 for (const [i, [name, slug, service, rating, text]] of sample.entries()) {

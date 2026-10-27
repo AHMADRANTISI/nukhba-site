@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { activeSeason, db, fmtDate, money, reviewerName, SERVICES, slotWhere, trustScore, type ServiceKey } from "@/lib/core";
+import { activeSeason, byServiceOrder, db, fmtDate, money, reviewerName, SERVICE_KEYS, SERVICES, slotWhere, trustScore, type ServiceKey } from "@/lib/core";
 import { getUser } from "@/lib/auth";
 import { Avatar, Crystal, SigilRing, TrustSeal } from "@/components/Art";
 import BookingForm from "./BookingForm";
@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const p = await db.player.findUnique({ where: { slug }, select: { name: true, title: true } });
-  return p ? { title: `${p.name} — حارس قمّة`, description: p.title } : {};
+  return p ? { title: `${p.name} — حارس النخبة`, description: p.title } : {};
 }
 
 function tiktokId(url: string) {
@@ -22,9 +22,10 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
   const { slug } = await params;
   const p = await db.player.findUnique({
     where: { slug },
-    include: { services: { where: { enabled: true } }, _count: { select: { bookings: { where: { status: "COMPLETED" } } } } },
+    include: { services: { where: { enabled: true, service: { in: SERVICE_KEYS } } }, _count: { select: { bookings: { where: { status: "COMPLETED" } } } } },
   });
   if (!p || !p.active) notFound();
+  p.services.sort(byServiceOrder);
   const [season, user] = await Promise.all([activeSeason(), getUser()]);
   const taken = season ? await db.booking.count({ where: slotWhere(p.id, season.id) }) : 0;
   const left = Math.max(0, p.slotsPerSeason - taken);
@@ -57,7 +58,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
             <div className="absolute -bottom-5 -left-5"><TrustSeal score={trustScore(p)} size={64} /></div>
           </div>
           <div className="flex-1 text-center md:text-right">
-            <p className="font-display text-sm text-ice">حارس قمّة {p.verifiedAt ? "موثّق" : ""}</p>
+            <p className="font-display text-sm text-ice">حارس النخبة {p.verifiedAt ? "موثّق" : ""}</p>
             <h1 className="mt-1 font-display text-6xl tracking-wider" dir="ltr">{p.name}</h1>
             <p className="mt-2 text-lg text-mist">{p.title}</p>
             {reviews.length > 0 && (
@@ -83,14 +84,13 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
           </div>
         </div>
 
-        <dl className="relative mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        <dl className="relative mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {[
             ["الجهاز", p.device || "—"],
             ["سنوات اللعب", p.experienceYrs],
             ["حساب أنجزه", completed],
-            ["كونكر كلاسيك", `${p.classicConqs}×`],
             ["كونكر ألتميت", `${p.ultimateConqs}×`],
-            ["أعلى مترو", p.metroTier || "—"],
+            ["كونكر كلاسيك", `${p.classicConqs}×`],
           ].map(([k, v]) => (
             <div key={k} className="rounded-xl border border-white/10 bg-night/40 p-3 text-center">
               <dd className="font-display text-2xl text-gold">{v}</dd>
@@ -105,7 +105,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
           {/* ── PRICES ── */}
           <section data-reveal className="shard p-6">
             <h2 className="font-display text-2xl">الأسعار ومدة الإنجاز</h2>
-            <div className="mt-5 grid gap-4 sm:grid-cols-3">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
               {p.services.map((s) => (
                 <div key={s.id} className="rounded-xl border border-white/10 bg-night/40 p-4 text-center">
                   <div className="flex justify-center"><Crystal kind={s.service as ServiceKey} size={72} /></div>

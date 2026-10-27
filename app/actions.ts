@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { randomBytes } from "crypto";
 import { z } from "zod";
 import { createSession, destroySession, requireUser } from "@/lib/auth";
-import { activeSeason, db, encrypt, SERVICE_KEYS, slotWhere } from "@/lib/core";
+import { activeSeason, db, SERVICE_KEYS, slotWhere } from "@/lib/core";
 import { saveImage } from "@/lib/upload";
 
 export type FormState = { error?: string; ok?: boolean } | null;
@@ -45,20 +45,15 @@ export async function book(_: FormState, f: FormData): Promise<FormState> {
   const user = await requireUser(`/players/${slug}`);
   const r = z.object({
     service: z.enum(SERVICE_KEYS as [string, ...string[]]),
-    mode: z.enum(["LOGIN", "DUO"]),
     gameName: z.string().trim().min(2, "اكتب اسمك في اللعبة"),
     gameId: z.string().trim().regex(/^\d{5,15}$/, "الـ ID أرقام فقط"),
     server: z.string().trim().min(2),
     contact: z.string().trim().min(6, "اكتب رقم واتساب أو معرف تيليجرام"),
     notes: z.string().trim().max(600).optional().default(""),
-    loginType: z.string().optional(),
-    loginUser: z.string().optional(),
-    loginPass: z.string().optional(),
     agree: z.literal("on", { errorMap: () => ({ message: "يجب الموافقة على ميثاق الحجز" }) }),
   }).safeParse(Object.fromEntries(f));
   if (!r.success) return { error: r.error.issues[0].message };
   const d = r.data;
-  if (d.mode === "LOGIN" && (!d.loginType || !d.loginUser || !d.loginPass)) return { error: "أكمل بيانات دخول الحساب أو اختر اللعب مع الحارس" };
 
   const season = await activeSeason();
   if (!season) return { error: "لا يوجد موسم مفتوح للحجز حالياً" };
@@ -73,10 +68,8 @@ export async function book(_: FormState, f: FormData): Promise<FormState> {
       if (used >= player.slotsPerSeason) throw new Error("FULL");
       await tx.booking.create({
         data: {
-          code, userId: user.id, playerId: player.id, seasonId: season.id, service: d.service, price: svc.price, mode: d.mode,
+          code, userId: user.id, playerId: player.id, seasonId: season.id, service: d.service, price: svc.price, mode: "QR",
           gameName: d.gameName, gameId: d.gameId, server: d.server, contact: d.contact, notes: d.notes,
-          loginType: d.mode === "LOGIN" ? d.loginType : null,
-          credentials: d.mode === "LOGIN" ? encrypt(JSON.stringify({ user: d.loginUser, pass: d.loginPass })) : null,
           events: { create: { text: "تم حجز المقعد — بانتظار إثبات الدفع خلال 24 ساعة" } },
         },
       });

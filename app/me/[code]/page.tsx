@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { db, fmtDate, HOLD_MS, money, SERVICES, settings, type ServiceKey } from "@/lib/core";
+import { db, fmtDate, HOLD_MS, MODES, money, SERVICES, settings, type ServiceKey } from "@/lib/core";
 import { StatusPill } from "@/components/StatusPill";
 import { cancelMyBooking } from "@/app/actions";
 import ProofForm from "./ProofForm";
 import ReviewForm from "./ReviewForm";
+import { QrGlyph } from "@/components/QrGlyph";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +33,7 @@ export default async function BookingPage({ params }: { params: Promise<{ code: 
         </div>
         <p className="mt-2 text-mist">
           {SERVICES[b.service as ServiceKey].name} مع الحارس <Link href={`/players/${b.player.slug}`} className="text-white underline" dir="ltr">{b.player.name}</Link>
-          {" · "}{b.season.name} · {b.mode === "DUO" ? "اللعب مع الحارس" : "دخول الحساب"}
+          {" · "}{b.season.name} · {MODES[b.mode] ?? b.mode}
         </p>
 
         {/* climb meter: a mountain whose summit lights when you arrive */}
@@ -51,6 +52,17 @@ export default async function BookingPage({ params }: { params: Promise<{ code: 
         {b.adminNote && <p className="mt-4 rounded-lg bg-ice/10 p-3 text-sm text-ice">ملاحظة الإدارة: {b.adminNote}</p>}
       </div>
 
+      {(b.status === "CONFIRMED" || b.status === "IN_PROGRESS") && b.mode === "QR" && (
+        <div data-reveal className="shard mt-6 flex items-center gap-4 border-gold/30 p-6">
+          <QrGlyph size={56} />
+          <div>
+            <h2 className="font-display text-xl">الدخول عبر رمز QR</h2>
+            <p className="mt-1 text-sm leading-7 text-mist">
+              سيرسل لك الحارس رمز QR على واتساب ({b.contact}). امسحه من داخل اللعبة ليدخل حسابك — لا تشارك كلمة مرورك مع أحد، ولا حتى معنا.
+            </p>
+          </div>
+        </div>
+      )}
       {(b.status === "PENDING_PAYMENT" || b.status === "PAYMENT_REVIEW") && !expired && (
         <div data-reveal className="shard mt-6 p-6">
           <h2 className="font-display text-2xl">الدفع</h2>

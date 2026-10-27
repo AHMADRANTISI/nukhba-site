@@ -41,7 +41,6 @@ export default async function EditPlayer({ params, searchParams }: { params: Pro
         {text("completedBase", "حسابات أنجزها قبل الانضمام", p?.completedBase, { type: "number", min: 0 })}
         {text("classicConqs", "مرات كونكر كلاسيك", p?.classicConqs, { type: "number", min: 0 })}
         {text("ultimateConqs", "مرات كونكر ألتميت", p?.ultimateConqs, { type: "number", min: 0 })}
-        {text("metroTier", "أعلى إنجاز مترو", p?.metroTier)}
         {text("kd", "K/D", p?.kd, { type: "number", step: "0.1", min: 0 })}
         {text("winRate", "نسبة الفوز %", p?.winRate, { type: "number", min: 0, max: 100 })}
         {text("slotsPerSeason", "عدد المقاعد في الموسم", p?.slotsPerSeason ?? 8, { type: "number", min: 1 })}
@@ -56,7 +55,7 @@ export default async function EditPlayer({ params, searchParams }: { params: Pro
 
       <section className="shard p-6">
         <h2 className="font-display text-xl">الأسعار ومدة الإنجاز حسب نوع الرانك</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {SERVICE_KEYS.map((k) => (
             <div key={k} className="space-y-2 rounded-xl border border-white/10 p-4">
               <label className="flex items-center gap-2 font-display"><input type="checkbox" name={`on_${k}`} defaultChecked={svc(k)?.enabled ?? !p} className="accent-[#ffcf6b]" />{SERVICES[k].name}</label>

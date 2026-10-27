@@ -1,6 +1,6 @@
 import AuthForms from "./AuthForms";
 
-export const metadata = { title: "الدخول — قِمّة" };
+export const metadata = { title: "الدخول — نخبة" };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next } = await searchParams;

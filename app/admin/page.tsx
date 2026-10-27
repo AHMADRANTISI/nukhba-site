@@ -47,7 +47,7 @@ export default async function AdminBookings({ searchParams }: { searchParams: Pr
                 <td className="p-3"><Link href={`/admin/bookings/${b.id}`} className="font-display text-ice" dir="ltr">{b.code}</Link></td>
                 <td className="p-3">{b.user.name}</td>
                 <td className="p-3" dir="ltr">{b.player.name}</td>
-                <td className="p-3">{SERVICES[b.service as ServiceKey].short} · {b.mode === "DUO" ? "معه" : "دخول"}</td>
+                <td className="p-3">{SERVICES[b.service as ServiceKey].short} · {b.mode === "QR" ? "QR" : b.mode === "DUO" ? "معه" : "دخول"}</td>
                 <td className="p-3 text-gold">{money(b.price)}</td>
                 <td className="p-3"><StatusPill status={b.status} /></td>
                 <td className="p-3 text-mist">{b.createdAt.toLocaleDateString("ar-EG")}</td>

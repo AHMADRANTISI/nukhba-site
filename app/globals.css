@@ -178,3 +178,13 @@ details[open] .chev { rotate: 45deg; }
 /* Cairo reads best bold for display text; Arabic must never get extra letter-spacing */
 .font-display { font-weight: 700; letter-spacing: 0; }
 h1.font-display { font-weight: 800; }
+
+/* NUKHBA crest motion */
+.crest-rim { stroke-dasharray: 140; stroke-dashoffset: 140; animation: draw-in 1.8s cubic-bezier(.6,.1,.2,1) .2s forwards; }
+.crest-star { transform-box: fill-box; transform-origin: center; animation: crest-star 4s ease-in-out infinite; }
+@keyframes crest-star { 0%, 100% { transform: scale(.75) rotate(0deg); opacity: .8; } 50% { transform: scale(1.15) rotate(45deg); opacity: 1; } }
+.crest-sheen { animation: crest-sheen 5s ease-in-out 1.6s infinite; }
+@keyframes crest-sheen { 0% { transform: rotate(20deg) translateX(0); } 35%, 100% { transform: rotate(20deg) translateX(80px); } }
+
+.qr-scan { animation: qr-scan 2.4s ease-in-out infinite; }
+@keyframes qr-scan { 0%, 100% { transform: translateY(1px); } 50% { transform: translateY(41px); } }
