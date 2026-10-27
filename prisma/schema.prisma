@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  phone        String
+  passwordHash String
+  role         String    @default("CUSTOMER") // CUSTOMER | ADMIN
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+  bookings     Booking[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+}
+
+// A verified professional booster ("حارس القمة")
+model Player {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String // in-game name
+  title          String   @default("") // short tagline
+  avatar         String? // file name under storage/avatars
+  country        String   @default("")
+  server         String   @default("الشرق الأوسط")
+  languages      String   @default("العربية")
+  device         String   @default("")
+  bio            String   @default("")
+  experienceYrs  Int      @default(0)
+  classicConqs   Int      @default(0) // times reached Conqueror (classic)
+  ultimateConqs  Int      @default(0) // times reached Conqueror (ultimate)
+  metroTier      String   @default("") // best Metro Royale achievement
+  kd             Float    @default(0)
+  winRate        Int      @default(0) // percent
+  achievements   String   @default("") // one per line
+  completedBase  Int      @default(0) // accounts finished before joining the site
+  tiktok         String   @default("") // TikTok username, without @
+  tiktokVideos   String   @default("") // clip URLs, one per line
+  slotsPerSeason Int      @default(8)
+  // Trust record — every flag is checked by the admin before publishing
+  idVerified     Boolean  @default(false)
+  cleanRecord    Boolean  @default(false) // no bans / no cheat history
+  gameplayReview Boolean  @default(false) // recorded gameplay reviewed
+  pledgeSigned   Boolean  @default(false) // signed the clean-play pledge
+  verifiedAt     DateTime?
+  active         Boolean  @default(true)
+  sort           Int      @default(0)
+  createdAt      DateTime @default(now())
+  services       PlayerService[]
+  bookings       Booking[]
+}
+
+model PlayerService {
+  id       String  @id @default(cuid())
+  playerId String
+  player   Player  @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  service  String // CLASSIC | ULTIMATE | METRO
+  price    Int // USD per booking
+  days     Int     @default(7) // typical delivery time
+  enabled  Boolean @default(true)
+
+  @@unique([playerId, service])
+}
+
+model Season {
+  id        String    @id @default(cuid())
+  name      String
+  startsAt  DateTime
+  endsAt    DateTime
+  active    Boolean   @default(false)
+  bookings  Booking[]
+}
+
+model Booking {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  playerId    String
+  player      Player   @relation(fields: [playerId], references: [id])
+  seasonId    String
+  season      Season   @relation(fields: [seasonId], references: [id])
+  service     String
+  price       Int
+  mode        String // LOGIN | DUO
+  gameName    String
+  gameId      String
+  server      String
+  contact     String
+  notes       String   @default("")
+  loginType   String? // Facebook | Twitter | Google | Email ...
+  credentials String? // AES-GCM encrypted, wiped on completion/cancel
+  status      String   @default("PENDING_PAYMENT")
+  proofFile   String?
+  progress    Int      @default(0) // 0-100
+  adminNote   String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  events      BookingEvent[]
+}
+
+model BookingEvent {
+  id        String   @id @default(cuid())
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  text      String
+  createdAt DateTime @default(now())
+}
+
+model PaymentMethod {
+  id      String  @id @default(cuid())
+  name    String
+  details String
+  active  Boolean @default(true)
+  sort    Int     @default(0)
+}
+
+model Setting {
+  key   String @id
+  value String
+}

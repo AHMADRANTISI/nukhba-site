@@ -1,0 +1,85 @@
+import { PrismaClient } from "@prisma/client";
+import { createCipheriv, createDecipheriv, randomBytes } from "crypto";
+
+const g = globalThis as unknown as { db?: PrismaClient };
+export const db = g.db ?? new PrismaClient();
+if (process.env.NODE_ENV !== "production") g.db = db;
+
+export const SERVICES = {
+  CLASSIC: { name: "كونكر كلاسيك", short: "كلاسيك", hue: "gold", blurb: "من أي رانك حتى قمة الكلاسيك — نقاط ثابتة ولعب نظيف." },
+  ULTIMATE: { name: "كونكر ألتميت", short: "ألتميت", hue: "violet", blurb: "طور الألتميت رويال بفريق واحد ضد الكل — للمحترفين فقط." },
+  METRO: { name: "مترو رويال", short: "مترو", hue: "cyan", blurb: "رفع رتبة المترو وتجميع العتاد بدون خسارة سلاحك." },
+} as const;
+export type ServiceKey = keyof typeof SERVICES;
+export const SERVICE_KEYS = Object.keys(SERVICES) as ServiceKey[];
+
+export const STATUS: Record<string, { label: string; tone: string }> = {
+  PENDING_PAYMENT: { label: "بانتظار الدفع", tone: "amber" },
+  PAYMENT_REVIEW: { label: "مراجعة الدفع", tone: "sky" },
+  CONFIRMED: { label: "مؤكد — بانتظار البدء", tone: "violet" },
+  IN_PROGRESS: { label: "قيد الصعود", tone: "cyan" },
+  COMPLETED: { label: "وصل القمة", tone: "gold" },
+  CANCELLED: { label: "ملغى", tone: "rose" },
+};
+
+export { LOGIN_TYPES } from "./core-client";
+
+// A booking holds a slot unless it is cancelled, or unpaid with no proof after 24h.
+export const HOLD_MS = 24 * 3600 * 1000;
+export function slotWhere(playerId: string, seasonId: string) {
+  return {
+    playerId,
+    seasonId,
+    status: { not: "CANCELLED" },
+    NOT: { status: "PENDING_PAYMENT", createdAt: { lt: new Date(Date.now() - HOLD_MS) } },
+  };
+}
+
+export async function activeSeason() {
+  return db.season.findFirst({ where: { active: true }, orderBy: { startsAt: "desc" } });
+}
+
+export async function takenSlots(seasonId: string | undefined) {
+  if (!seasonId) return new Map<string, number>();
+  const rows = await db.booking.groupBy({
+    by: ["playerId"],
+    _count: true,
+    where: {
+      seasonId,
+      status: { not: "CANCELLED" },
+      NOT: { status: "PENDING_PAYMENT", createdAt: { lt: new Date(Date.now() - HOLD_MS) } },
+    },
+  });
+  return new Map(rows.map((r) => [r.playerId, r._count]));
+}
+
+export async function settings() {
+  const rows = await db.setting.findMany();
+  return Object.fromEntries(rows.map((r) => [r.key, r.value])) as Record<string, string>;
+}
+
+export function trustScore(p: { idVerified: boolean; cleanRecord: boolean; gameplayReview: boolean; pledgeSigned: boolean }) {
+  return [p.idVerified, p.cleanRecord, p.gameplayReview, p.pledgeSigned].filter(Boolean).length;
+}
+
+// Customers' game credentials: AES-256-GCM with CRED_KEY.
+function key() {
+  const k = Buffer.from(process.env.CRED_KEY || "", "base64");
+  if (k.length !== 32) throw new Error("CRED_KEY must be 32 bytes base64");
+  return k;
+}
+export function encrypt(text: string) {
+  const iv = randomBytes(12);
+  const c = createCipheriv("aes-256-gcm", key(), iv);
+  const data = Buffer.concat([c.update(text, "utf8"), c.final()]);
+  return [iv, c.getAuthTag(), data].map((b) => b.toString("base64")).join(".");
+}
+export function decrypt(blob: string) {
+  const [iv, tag, data] = blob.split(".").map((s) => Buffer.from(s, "base64"));
+  const d = createDecipheriv("aes-256-gcm", key(), iv);
+  d.setAuthTag(tag);
+  return Buffer.concat([d.update(data), d.final()]).toString("utf8");
+}
+
+export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
+export const fmtDate = (d: Date) => d.toLocaleDateString("ar-EG", { day: "numeric", month: "long", year: "numeric" });
