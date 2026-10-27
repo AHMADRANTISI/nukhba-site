@@ -118,3 +118,11 @@ export async function saveSettings(f: FormData) {
   }
   revalidatePath("/", "layout");
 }
+
+// Moderation: hidden reviews disappear from the profile and from the average.
+export async function toggleReview(f: FormData) {
+  await requireAdmin();
+  const r = await db.review.findUniqueOrThrow({ where: { id: str(f, "id") } });
+  await db.review.update({ where: { id: r.id }, data: { hidden: !r.hidden } });
+  revalidatePath("/", "layout");
+}

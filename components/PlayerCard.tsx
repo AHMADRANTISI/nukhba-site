@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SERVICES, money, trustScore, type ServiceKey } from "@/lib/core";
 import { Avatar, SigilRing, TrustSeal } from "./Art";
+import { Stars, type RatingSummary } from "./Stars";
 
 type P = {
   slug: string; name: string; title: string; avatar: string | null; country: string; device: string;
@@ -10,7 +11,7 @@ type P = {
 };
 
 // A guardian "dossier" card — tilts in 3D under the cursor, shows the 8-slot sigil.
-export default function PlayerCard({ p, taken, delay = 0 }: { p: P; taken: number; delay?: number }) {
+export default function PlayerCard({ p, taken, rating, delay = 0 }: { p: P; taken: number; rating?: RatingSummary; delay?: number }) {
   const left = p.slotsPerSeason - taken;
   const from = p.services.length ? Math.min(...p.services.map((s) => s.price)) : 0;
   return (
@@ -26,6 +27,11 @@ export default function PlayerCard({ p, taken, delay = 0 }: { p: P; taken: numbe
             <h3 className="font-display text-2xl tracking-wide text-white" dir="ltr" style={{ textAlign: "right" }}>{p.name}</h3>
             <p className="truncate text-sm text-mist">{p.title}</p>
             <p className="mt-1 text-xs text-mist/60">{[p.country, p.device].filter(Boolean).join(" • ")}</p>
+            <p className="mt-1.5 flex items-center gap-2 text-xs text-mist">
+              {rating?.count ? (
+                <><Stars value={rating.avg} size={13} /><b className="text-gold">{rating.avg.toFixed(1)}</b>({rating.count} تقييم)</>
+              ) : <span className="text-mist/50">لا تقييمات بعد</span>}
+            </p>
           </div>
           <SigilRing total={p.slotsPerSeason} taken={taken} size={78} />
         </div>

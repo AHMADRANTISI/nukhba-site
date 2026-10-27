@@ -17,6 +17,7 @@ model User {
   createdAt    DateTime  @default(now())
   sessions     Session[]
   bookings     Booking[]
+  reviews      Review[]
 }
 
 model Session {
@@ -61,6 +62,7 @@ model Player {
   createdAt      DateTime @default(now())
   services       PlayerService[]
   bookings       Booking[]
+  reviews        Review[]
 }
 
 model PlayerService {
@@ -110,6 +112,25 @@ model Booking {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   events      BookingEvent[]
+  review      Review?
+}
+
+// One review per completed booking, written by the customer who booked.
+model Review {
+  id        String   @id @default(cuid())
+  bookingId String   @unique
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  playerId  String
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  rating    Int // 1-5
+  text      String   @default("")
+  hidden    Boolean  @default(false) // hidden by admin moderation
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([playerId, hidden])
 }
 
 model BookingEvent {

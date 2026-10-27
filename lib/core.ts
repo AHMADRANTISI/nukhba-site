@@ -53,6 +53,15 @@ export async function takenSlots(seasonId: string | undefined) {
   return new Map(rows.map((r) => [r.playerId, r._count]));
 }
 
+// Average rating and count of visible reviews, per player.
+export async function ratings() {
+  const rows = await db.review.groupBy({ by: ["playerId"], where: { hidden: false }, _avg: { rating: true }, _count: true });
+  return new Map(rows.map((r) => [r.playerId, { avg: r._avg.rating ?? 0, count: r._count }]));
+}
+
+// Shows only the first name of a reviewer, for privacy.
+export const reviewerName = (name: string) => name.trim().split(/\s+/)[0] || "عميل";
+
 export async function settings() {
   const rows = await db.setting.findMany();
   return Object.fromEntries(rows.map((r) => [r.key, r.value])) as Record<string, string>;

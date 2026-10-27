@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { activeSeason, db, SERVICE_KEYS, SERVICES, takenSlots } from "@/lib/core";
+import { activeSeason, db, SERVICE_KEYS, SERVICES, takenSlots, ratings } from "@/lib/core";
 import { Crystal, Range } from "@/components/Art";
 import PlayerCard, { playerSelect, withCompleted } from "@/components/PlayerCard";
 
@@ -9,9 +9,10 @@ const TITLE = "اصعد إلى القمّة";
 
 export default async function Home() {
   const season = await activeSeason();
-  const [players, taken] = await Promise.all([
+  const [players, taken, rated] = await Promise.all([
     db.player.findMany({ where: { active: true }, orderBy: { sort: "asc" }, take: 4, select: playerSelect }),
     takenSlots(season?.id),
+    ratings(),
   ]);
   const all = await db.player.findMany({ where: { active: true }, select: { id: true, slotsPerSeason: true } });
   const totalSlots = all.reduce((n, p) => n + p.slotsPerSeason, 0);
@@ -61,7 +62,7 @@ export default async function Home() {
       <section className="relative mx-auto max-w-6xl px-4 py-16">
         <SectionHead kicker="حرّاس القمة" title="لاعبون نعرفهم بالاسم" sub="كل حلقة حول الحارس = 8 مقاعد للموسم. الذهبي محجوز، المضيء متاح." />
         <div className="mt-12 grid gap-6 md:grid-cols-2">
-          {players.map((p, i) => <PlayerCard key={p.id} p={withCompleted(p)} taken={taken.get(p.id) ?? 0} delay={i * 0.1} />)}
+          {players.map((p, i) => <PlayerCard key={p.id} p={withCompleted(p)} taken={taken.get(p.id) ?? 0} rating={rated.get(p.id)} delay={i * 0.1} />)}
         </div>
         <div className="mt-10 text-center"><Link href="/players" className="btn-ghost">كل الحرّاس</Link></div>
       </section>

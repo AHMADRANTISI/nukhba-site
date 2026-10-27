@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { activeSeason, db, money, SERVICES, slotWhere, trustScore, type ServiceKey } from "@/lib/core";
+import { activeSeason, db, fmtDate, money, reviewerName, SERVICES, slotWhere, trustScore, type ServiceKey } from "@/lib/core";
 import { getUser } from "@/lib/auth";
 import { Avatar, Crystal, SigilRing, TrustSeal } from "@/components/Art";
 import BookingForm from "./BookingForm";
+import { Stars } from "@/components/Stars";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,12 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
   const taken = season ? await db.booking.count({ where: slotWhere(p.id, season.id) }) : 0;
   const left = Math.max(0, p.slotsPerSeason - taken);
   const completed = p.completedBase + p._count.bookings;
+  const reviews = await db.review.findMany({
+    where: { playerId: p.id, hidden: false }, orderBy: { createdAt: "desc" }, take: 30,
+    include: { user: { select: { name: true } }, booking: { select: { service: true } } },
+  });
+  const avg = reviews.length ? reviews.reduce((n, r) => n + r.rating, 0) / reviews.length : 0;
+  const dist = [5, 4, 3, 2, 1].map((s) => [s, reviews.filter((r) => r.rating === s).length] as const);
   const clips = p.tiktokVideos.split("\n").map((u) => tiktokId(u.trim())).filter(Boolean).slice(0, 6) as string[];
   const checks: [boolean, string, string][] = [
     [p.idVerified, "هوية موثّقة", "تم التحقق من هويته ووسيلة تواصله"],
@@ -53,6 +60,11 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
             <p className="font-display text-sm tracking-[.3em] text-ice">حارس قمّة {p.verifiedAt ? "موثّق" : ""}</p>
             <h1 className="mt-1 font-display text-6xl tracking-wider" dir="ltr">{p.name}</h1>
             <p className="mt-2 text-lg text-mist">{p.title}</p>
+            {reviews.length > 0 && (
+              <a href="#reviews" className="mt-2 inline-flex items-center gap-2 text-sm text-mist hover:text-white">
+                <Stars value={avg} size={18} /><b className="font-display text-lg text-gold">{avg.toFixed(1)}</b>({reviews.length} تقييم)
+              </a>
+            )}
             <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm md:justify-start">
               {[p.country, p.server, p.languages].filter(Boolean).map((t) => (
                 <span key={t} className="rounded-full bg-white/5 px-3 py-1 text-mist">{t}</span>
@@ -151,6 +163,48 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
               )}
             </section>
           )}
+
+          {/* ── REVIEWS — only from customers whose account was completed ── */}
+          <section id="reviews" data-reveal className="shard scroll-mt-24 p-6">
+            <h2 className="font-display text-2xl">تقييمات من وصلوا القمّة</h2>
+            {reviews.length ? (
+              <>
+                <div className="mt-5 grid items-center gap-6 sm:grid-cols-[auto_1fr]">
+                  <div className="text-center">
+                    <div className="font-display text-6xl text-gold drop-shadow-[0_0_18px_#ffcf6b66]">{avg.toFixed(1)}</div>
+                    <Stars value={avg} size={20} />
+                    <p className="mt-1 text-xs text-mist">{reviews.length} تقييم موثّق</p>
+                  </div>
+                  <ul className="space-y-1.5">
+                    {dist.map(([s, n]) => (
+                      <li key={s} className="flex items-center gap-3 text-sm">
+                        <span className="w-8 text-mist">{s} ★</span>
+                        <span className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+                          <span className="block h-full rounded-full bg-gradient-to-l from-gold to-ember" style={{ width: `${(n / reviews.length) * 100}%` }} />
+                        </span>
+                        <span className="w-6 text-left text-mist">{n}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <ul className="mt-6 space-y-3">
+                  {reviews.map((r) => (
+                    <li key={r.id} className="rounded-xl border border-white/10 bg-night/40 p-4">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <b className="font-display">{reviewerName(r.user.name)}</b>
+                        <Stars value={r.rating} size={14} />
+                        <span className="rounded-full bg-gold/10 px-2 py-0.5 text-[11px] text-gold">✓ حساب منجز · {SERVICES[r.booking.service as ServiceKey].short}</span>
+                        <span className="ms-auto text-xs text-mist/60">{fmtDate(r.createdAt)}</span>
+                      </div>
+                      {r.text && <p className="mt-2 whitespace-pre-line leading-7 text-mist">{r.text}</p>}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p className="mt-3 text-mist">لا توجد تقييمات بعد. التقييم متاح فقط لمن أنجز الحارس حسابه — لا تقييمات وهمية.</p>
+            )}
+          </section>
         </div>
 
         {/* ── BOOKING ── */}

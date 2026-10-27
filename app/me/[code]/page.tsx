@@ -5,6 +5,7 @@ import { db, fmtDate, HOLD_MS, money, SERVICES, settings, type ServiceKey } from
 import { StatusPill } from "@/components/StatusPill";
 import { cancelMyBooking } from "@/app/actions";
 import ProofForm from "./ProofForm";
+import ReviewForm from "./ReviewForm";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,7 @@ export default async function BookingPage({ params }: { params: Promise<{ code: 
   const user = await requireUser(`/me/${code}`);
   const b = await db.booking.findUnique({
     where: { code },
-    include: { player: true, season: true, events: { orderBy: { createdAt: "desc" } } },
+    include: { player: true, season: true, review: true, events: { orderBy: { createdAt: "desc" } } },
   });
   if (!b || b.userId !== user.id) notFound();
   const [methods, s] = await Promise.all([db.paymentMethod.findMany({ where: { active: true }, orderBy: { sort: "asc" } }), settings()]);
@@ -76,7 +77,15 @@ export default async function BookingPage({ params }: { params: Promise<{ code: 
           )}
         </div>
       )}
-      {expired && <p className="shard mt-6 p-6 text-rose">انتهت مهلة الدفع (24 ساعة) وعاد المقعد متاحاً. يمكنك الحجز من جديد إن بقيت مقاعد.</p>}
+      {b.status === "COMPLETED" && (
+        <div data-reveal className="shard mt-6 border-gold/30 p-6">
+          <h2 className="font-display text-2xl">{b.review ? "تقييمك للحارس" : "وصلت القمّة — قيّم حارسك"}</h2>
+          <p className="mt-1 text-sm text-mist">تقييمك يظهر على ملف الحارس ويساعد غيرك على الاختيار.</p>
+          <ReviewForm code={b.code} player={b.player.name}
+            initial={b.review ? { rating: b.review.rating, text: b.review.text, hidden: b.review.hidden } : undefined} />
+        </div>
+      )}
+      {expired &&<p className="shard mt-6 p-6 text-rose">انتهت مهلة الدفع (24 ساعة) وعاد المقعد متاحاً. يمكنك الحجز من جديد إن بقيت مقاعد.</p>}
 
       <div data-reveal className="shard mt-6 p-6">
         <h2 className="font-display text-2xl">سجل الرحلة</h2>

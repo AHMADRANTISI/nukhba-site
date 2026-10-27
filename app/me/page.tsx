@@ -9,7 +9,7 @@ export default async function MyBookings() {
   const user = await requireUser("/me");
   const bookings = await db.booking.findMany({
     where: { userId: user.id }, orderBy: { createdAt: "desc" },
-    include: { player: { select: { name: true } }, season: { select: { name: true } } },
+    include: { player: { select: { name: true } }, season: { select: { name: true } }, review: { select: { id: true } } },
   });
   return (
     <section className="mx-auto max-w-4xl px-4 py-14">
@@ -24,6 +24,7 @@ export default async function MyBookings() {
             </div>
             <span className="font-display text-gold">{money(b.price)}</span>
             <StatusPill status={b.status} />
+            {b.status === "COMPLETED" && !b.review && <span className="rounded-full bg-gold px-3 py-1 text-xs text-night">★ قيّم حارسك</span>}
           </Link>
         ))}
         {!bookings.length && (

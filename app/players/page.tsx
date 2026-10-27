@@ -1,4 +1,4 @@
-import { activeSeason, db, takenSlots } from "@/lib/core";
+import { activeSeason, db, takenSlots, ratings } from "@/lib/core";
 import PlayerCard, { playerSelect, withCompleted } from "@/components/PlayerCard";
 
 export const dynamic = "force-dynamic";
@@ -6,9 +6,10 @@ export const metadata = { title: "حرّاس القمة — قِمّة" };
 
 export default async function Players() {
   const season = await activeSeason();
-  const [players, taken] = await Promise.all([
+  const [players, taken, rated] = await Promise.all([
     db.player.findMany({ where: { active: true }, orderBy: { sort: "asc" }, select: playerSelect }),
     takenSlots(season?.id),
+    ratings(),
   ]);
   return (
     <section className="mx-auto max-w-6xl px-4 py-16">
@@ -18,7 +19,7 @@ export default async function Players() {
         <p className="mx-auto mt-3 max-w-lg text-mist">كل حارس موثّق بأربع خطوات وله 8 مقاعد فقط في الموسم.</p>
       </div>
       <div className="mt-12 grid gap-6 md:grid-cols-2">
-        {players.map((p, i) => <PlayerCard key={p.id} p={withCompleted(p)} taken={taken.get(p.id) ?? 0} delay={(i % 2) * 0.1} />)}
+        {players.map((p, i) => <PlayerCard key={p.id} p={withCompleted(p)} taken={taken.get(p.id) ?? 0} rating={rated.get(p.id)} delay={(i % 2) * 0.1} />)}
       </div>
       {!players.length && <p className="mt-12 text-center text-mist">لا يوجد حرّاس منشورون بعد.</p>}
     </section>

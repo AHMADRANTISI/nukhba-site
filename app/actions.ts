@@ -8,7 +8,7 @@ import { createSession, destroySession, requireUser } from "@/lib/auth";
 import { activeSeason, db, encrypt, SERVICE_KEYS, slotWhere } from "@/lib/core";
 import { saveImage } from "@/lib/upload";
 
-export type FormState = { error?: string } | null;
+export type FormState = { error?: string; ok?: boolean } | null;
 
 const safeNext = (n: unknown) => (typeof n === "string" && n.startsWith("/") && !n.startsWith("//") ? n : "/me");
 
@@ -116,4 +116,27 @@ export async function cancelMyBooking(f: FormData) {
     data: { status: "CANCELLED", credentials: null, events: { create: { text: "ألغى العميل الحجز — تم مسح بيانات الحساب" } } },
   });
   revalidatePath(`/me/${b.code}`);
+}
+
+// Only the customer of a COMPLETED booking can rate; re-submitting edits the same review.
+export async function submitReview(_: FormState, f: FormData): Promise<FormState> {
+  const user = await requireUser();
+  const r = z.object({
+    code: z.string(),
+    rating: z.coerce.number().int().min(1, "اختر عدد النجوم").max(5),
+    text: z.string().trim().max(800, "التقييم طويل جداً (800 حرف كحد أقصى)").optional().default(""),
+  }).safeParse(Object.fromEntries(f));
+  if (!r.success) return { error: r.error.issues[0].message };
+  const b = await db.booking.findUnique({ where: { code: r.data.code } });
+  if (!b || b.userId !== user.id) return { error: "الحجز غير موجود" };
+  if (b.status !== "COMPLETED") return { error: "يمكنك التقييم بعد إنجاز الحساب فقط" };
+  const { rating, text } = r.data;
+  await db.review.upsert({
+    where: { bookingId: b.id },
+    update: { rating, text },
+    create: { bookingId: b.id, playerId: b.playerId, userId: user.id, rating, text },
+  });
+  revalidatePath(`/me/${b.code}`);
+  revalidatePath("/", "layout");
+  return { ok: true };
 }
