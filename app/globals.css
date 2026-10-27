@@ -1,16 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-night: #05060f;
-  --color-deep: #0b0e24;
-  --color-ink: #141a3a;
-  --color-ice: #8ff3ff;
-  --color-glacier: #4cc9f0;
-  --color-gold: #ffcf6b;
-  --color-ember: #ff8a3d;
-  --color-violet: #a78bfa;
-  --color-rose: #fb7185;
-  --color-mist: #c7cdee;
+  /* obsidian + gold leaf + champagne */
+  --color-night: #050405;
+  --color-deep: #0c0a09;
+  --color-ink: #17130e;
+  --color-ice: #f1e3bf;
+  --color-glacier: #c9a24b;
+  --color-gold: #e6c36a;
+  --color-ember: #b8862f;
+  --color-violet: #b9a2f5;
+  --color-rose: #f08a8a;
+  --color-mist: #bdb3a0;
   --font-display: var(--font-kufi), sans-serif;
   --font-sans: var(--font-plex), sans-serif;
 }
@@ -23,25 +24,33 @@
 html { scroll-behavior: smooth; }
 body {
   background: var(--color-night);
-  color: #e9ecff;
+  color: #f4efe4;
   font-family: var(--font-sans);
   overflow-x: hidden;
 }
+/* film grain over everything — gives the black a velvet texture */
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 60; pointer-events: none;
+  opacity: .06; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
 
-::selection { background: #ffcf6b55; }
+::selection { background: #d4af3755; }
 
-/* ── glass shards: panels with a chamfered ice-cut corner ─────────── */
+/* ── panels: smoked glass with a gold hairline and a chamfered corner ─ */
 .shard {
   position: relative;
-  background: linear-gradient(160deg, #ffffff10, #ffffff03 60%);
-  border: 1px solid #ffffff18;
+  background: linear-gradient(160deg, #ffffff0b, #ffffff02 60%), #0b0908b3;
+  border: 1px solid #d4af3729;
+  box-shadow: inset 0 1px 0 #f7e7b414;
   backdrop-filter: blur(14px);
   clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
 }
 .shard::before {
   content: "";
   position: absolute; inset: 0;
-  background: linear-gradient(115deg, transparent 30%, #8ff3ff22 45%, transparent 60%);
+  background: linear-gradient(115deg, transparent 30%, #f7e7b41f 45%, transparent 60%);
   background-size: 250% 100%;
   background-position: 120% 0;
   transition: background-position 1.1s ease;
@@ -56,9 +65,12 @@ body {
   font-family: var(--font-display);
   font-size: 1.05rem;
   color: #1a1206;
-  background: linear-gradient(135deg, #ffe7a8, #ffcf6b 40%, #ff8a3d);
+  /* brushed gold: light catches the top edge, darker towards the bottom */
+  background:
+    linear-gradient(180deg, #ffffff55, transparent 45%),
+    linear-gradient(100deg, #a8823a, #f7e7b4 30%, #d4af37 55%, #fff4d1 70%, #b8892f);
   clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
-  box-shadow: 0 0 40px #ffcf6b44;
+  box-shadow: 0 0 40px #d4af3744;
   transition: transform .25s, filter .25s;
 }
 .btn-summit:hover { transform: translateY(-2px); filter: brightness(1.1); }
@@ -67,16 +79,16 @@ body {
   padding: .8rem 1.6rem;
   font-family: var(--font-display);
   color: var(--color-ice);
-  border: 1px solid #8ff3ff55;
+  border: 1px solid #d4af3766;
   clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
-  background: #8ff3ff0d;
+  background: #d4af370d;
   transition: background .25s;
 }
-.btn-ghost:hover { background: #8ff3ff22; }
+.btn-ghost:hover { background: #d4af3722; }
 
 .field {
   width: 100%;
-  background: #0b0e24cc;
+  background: #0c0a09cc;
   border: 1px solid #ffffff1f;
   border-radius: 10px;
   padding: .7rem .9rem;
@@ -84,16 +96,22 @@ body {
   outline: none;
   transition: border-color .2s, box-shadow .2s;
 }
-.field:focus { border-color: var(--color-ice); box-shadow: 0 0 0 3px #8ff3ff22; }
+.field:focus { border-color: var(--color-gold); box-shadow: 0 0 0 3px #d4af3722; }
 .label { display: block; font-size: .85rem; color: var(--color-mist); margin-bottom: .35rem; }
 
+/* gold foil: a highlight sweeps across the letters */
 .text-aurora {
-  background: linear-gradient(90deg, #8ff3ff, #a78bfa, #ffcf6b, #8ff3ff);
-  background-size: 300% 100%;
+  background: linear-gradient(100deg, #9a7634 0%, #f7e7b4 18%, #c9a24b 32%, #fff6dc 42%, #b8892f 56%, #f7e7b4 72%, #9a7634 100%);
+  background-size: 250% 100%;
   -webkit-background-clip: text; background-clip: text; color: transparent;
-  animation: aurora-text 9s linear infinite;
+  filter: drop-shadow(0 0 24px #d4af3740);
+  animation: aurora-text 7s ease-in-out infinite alternate;
 }
-@keyframes aurora-text { to { background-position: 300% 0; } }
+@keyframes aurora-text { from { background-position: 0 0; } to { background-position: 100% 0; } }
+
+/* line art that draws itself once on load */
+.draw-in { stroke-dasharray: 2600; stroke-dashoffset: 2600; animation: draw-in 3.2s cubic-bezier(.6,.1,.2,1) forwards; }
+@keyframes draw-in { to { stroke-dashoffset: 0; } }
 
 /* ── reveal on scroll ─────────────────────────────────────────────── */
 [data-reveal] {
@@ -156,3 +174,7 @@ details[open] .chev { rotate: 45deg; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   [data-reveal], .rise > span { opacity: 1; transform: none; filter: none; }
 }
+
+/* Cairo reads best bold for display text; Arabic must never get extra letter-spacing */
+.font-display { font-weight: 700; letter-spacing: 0; }
+h1.font-display { font-weight: 800; }

@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-// Full-page night sky: twinkling stars, drifting aurora ribbons and snow/ember particles.
+// Full-page luxury backdrop: obsidian black, slow golden light beams from above,
+// and drifting gold dust (soft bokeh + sharp glints) that catches the light.
 export default function SkyCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -12,69 +13,94 @@ export default function SkyCanvas() {
     let w = 0, h = 0, raf = 0, t = 0;
     const dpr = Math.min(devicePixelRatio || 1, 2);
 
-    type Star = { x: number; y: number; r: number; p: number };
-    type Flake = { x: number; y: number; r: number; vy: number; vx: number; ember: boolean };
-    let stars: Star[] = [];
-    let flakes: Flake[] = [];
+    type Mote = { x: number; y: number; r: number; vx: number; vy: number; a: number; p: number; bokeh: boolean };
+    let motes: Mote[] = [];
+
+    function mote(anywhere: boolean): Mote {
+      const bokeh = Math.random() < 0.18;
+      return {
+        x: Math.random() * w,
+        y: anywhere ? Math.random() * h : h + 20,
+        r: bokeh ? Math.random() * 10 + 6 : Math.random() * 1.4 + 0.3,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: -(Math.random() * 0.25 + 0.05),
+        a: bokeh ? Math.random() * 0.08 + 0.03 : Math.random() * 0.6 + 0.25,
+        p: Math.random() * 7,
+        bokeh,
+      };
+    }
 
     function resize() {
       w = innerWidth; h = innerHeight;
       canvas.width = w * dpr; canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const n = Math.round((w * h) / 4200);
-      stars = Array.from({ length: n }, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.3 + .2, p: Math.random() * 6 }));
-      flakes = Array.from({ length: Math.round(n / 5) }, () => newFlake(true));
-    }
-    function newFlake(anywhere = false): Flake {
-      const ember = Math.random() < .25;
-      return { x: Math.random() * w, y: anywhere ? Math.random() * h : ember ? h + 10 : -10, r: Math.random() * 1.8 + .4, vy: ember ? -(Math.random() * .6 + .2) : Math.random() * .6 + .25, vx: Math.random() * .4 - .2, ember };
+      motes = Array.from({ length: Math.round((w * h) / 9000) }, () => mote(true));
     }
 
-    function aurora(offset: number, color: string, amp: number, yBase: number) {
-      const g = ctx.createLinearGradient(0, yBase - 160, 0, yBase + 120);
-      g.addColorStop(0, "transparent");
-      g.addColorStop(.5, color);
-      g.addColorStop(1, "transparent");
+    // A soft beam fanning down from a point above the top edge.
+    function beam(angle: number, width: number, alpha: number) {
+      const ox = w * 0.5, oy = -h * 0.15, len = h * 1.5;
+      const a0 = angle - width / 2, a1 = angle + width / 2;
+      const g = ctx.createLinearGradient(ox, oy, ox, oy + len);
+      g.addColorStop(0, `rgba(255,214,140,${alpha})`);
+      g.addColorStop(0.55, `rgba(212,175,55,${alpha * 0.35})`);
+      g.addColorStop(1, "rgba(212,175,55,0)");
       ctx.fillStyle = g;
       ctx.beginPath();
-      ctx.moveTo(0, h);
-      for (let x = 0; x <= w; x += 24) {
-        const y = yBase + Math.sin(x * .004 + t * .0006 + offset) * amp + Math.sin(x * .011 + t * .001 + offset * 2) * amp * .35;
-        ctx.lineTo(x, y);
-      }
-      ctx.lineTo(w, yBase - 220);
-      ctx.lineTo(0, yBase - 220);
+      ctx.moveTo(ox, oy);
+      ctx.lineTo(ox + Math.sin(a0) * len, oy + Math.cos(a0) * len);
+      ctx.lineTo(ox + Math.sin(a1) * len, oy + Math.cos(a1) * len);
       ctx.closePath();
       ctx.fill();
     }
 
     function frame() {
       t += 16;
-      ctx.clearRect(0, 0, w, h);
-      const sky = ctx.createLinearGradient(0, 0, 0, h);
-      sky.addColorStop(0, "#05060f");
-      sky.addColorStop(.6, "#0b0e24");
-      sky.addColorStop(1, "#140f2e");
-      ctx.fillStyle = sky;
+      // obsidian base with a warm crown of light at the top
+      const base = ctx.createLinearGradient(0, 0, 0, h);
+      base.addColorStop(0, "#0c0a08");
+      base.addColorStop(0.5, "#070608");
+      base.addColorStop(1, "#040405");
+      ctx.fillStyle = base;
+      ctx.fillRect(0, 0, w, h);
+      const crown = ctx.createRadialGradient(w / 2, -h * 0.1, 0, w / 2, -h * 0.1, Math.max(w, h) * 0.75);
+      crown.addColorStop(0, "rgba(212,175,55,0.22)");
+      crown.addColorStop(0.4, "rgba(140,100,40,0.07)");
+      crown.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = crown;
       ctx.fillRect(0, 0, w, h);
 
       ctx.globalCompositeOperation = "lighter";
-      aurora(0, "#4cc9f022", 60, h * .28);
-      aurora(2.1, "#a78bfa1c", 80, h * .22);
-      aurora(4.2, "#34d39914", 50, h * .34);
+      const sway = Math.sin(t * 0.00015);
+      beam(-0.42 + sway * 0.05, 0.10, 0.05);
+      beam(-0.16 + sway * 0.03, 0.06, 0.07);
+      beam(0.05 - sway * 0.04, 0.13, 0.045);
+      beam(0.30 - sway * 0.05, 0.07, 0.06);
 
-      for (const s of stars) {
-        const a = .35 + Math.sin(t * .002 + s.p) * .35;
-        ctx.fillStyle = `rgba(220,235,255,${a})`;
-        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7); ctx.fill();
-      }
-      for (const f of flakes) {
-        f.y += f.vy; f.x += f.vx + Math.sin((t + f.y * 20) * .001) * .2;
-        if (f.y > h + 12 || f.y < -12) Object.assign(f, newFlake());
-        ctx.fillStyle = f.ember ? "rgba(255,160,80,.75)" : "rgba(220,245,255,.7)";
-        ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 7); ctx.fill();
+      for (const m of motes) {
+        m.x += m.vx + Math.sin((t + m.p * 900) * 0.0004) * 0.12;
+        m.y += m.vy;
+        if (m.y < -30) Object.assign(m, mote(false));
+        const flicker = m.bokeh ? 1 : 0.55 + Math.sin(t * 0.003 + m.p) * 0.45;
+        if (m.bokeh) {
+          const g = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r);
+          g.addColorStop(0, `rgba(255,220,150,${m.a})`);
+          g.addColorStop(1, "rgba(255,220,150,0)");
+          ctx.fillStyle = g;
+        } else {
+          ctx.fillStyle = `rgba(255,226,160,${m.a * flicker})`;
+        }
+        ctx.beginPath(); ctx.arc(m.x, m.y, m.r, 0, 7); ctx.fill();
       }
       ctx.globalCompositeOperation = "source-over";
+
+      // vignette keeps the edges deep and the centre glowing
+      const v = ctx.createRadialGradient(w / 2, h * 0.45, Math.min(w, h) * 0.3, w / 2, h * 0.45, Math.max(w, h) * 0.8);
+      v.addColorStop(0, "rgba(0,0,0,0)");
+      v.addColorStop(1, "rgba(0,0,0,0.65)");
+      ctx.fillStyle = v;
+      ctx.fillRect(0, 0, w, h);
+
       if (!reduce) raf = requestAnimationFrame(frame);
     }
 

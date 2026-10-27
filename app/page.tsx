@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { activeSeason, db, SERVICE_KEYS, SERVICES, takenSlots, ratings } from "@/lib/core";
-import { Crystal, Range } from "@/components/Art";
+import { Crystal, Halo, Range } from "@/components/Art";
 import PlayerCard, { playerSelect, withCompleted } from "@/components/PlayerCard";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +24,8 @@ export default async function Home() {
       <section className="relative flex min-h-[calc(100dvh-60px)] items-start overflow-hidden">
         <Range />
         <div className="relative z-10 mx-auto w-full max-w-6xl px-4 pt-[12vh] text-center">
+          <Halo />
+          <div aria-hidden className="pointer-events-none absolute -z-10 inset-x-0 top-[8vh] mx-auto h-[70%] max-w-3xl rounded-full bg-[radial-gradient(closest-side,#000c,transparent)]" />
           <p data-reveal className="mx-auto inline-flex items-center gap-2 rounded-full border border-ice/30 bg-ice/5 px-4 py-1 text-xs text-ice">
             <span className="h-1.5 w-1.5 rounded-full bg-ice beacon" />
             {season ? `${season.name} مفتوح للحجز — ${totalSlots - used} مقعد متبقٍ` : "الموسم القادم قريباً"}
@@ -149,7 +151,7 @@ export default async function Home() {
 function SectionHead({ kicker, title, sub }: { kicker: string; title: string; sub?: string }) {
   return (
     <div data-reveal className="text-center">
-      <p className="font-display text-sm tracking-[.3em] text-ice">{kicker}</p>
+      <p className="font-display text-sm text-ice">{kicker}</p>
       <h2 className="mt-2 font-display text-4xl sm:text-5xl">{title}</h2>
       {sub && <p className="mx-auto mt-3 max-w-lg text-mist">{sub}</p>}
     </div>

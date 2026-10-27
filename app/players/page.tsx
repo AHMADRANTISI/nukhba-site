@@ -14,7 +14,7 @@ export default async function Players() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-16">
       <div data-reveal className="text-center">
-        <p className="font-display text-sm tracking-[.3em] text-ice">{season?.name ?? "لا يوجد موسم نشط"}</p>
+        <p className="font-display text-sm text-ice">{season?.name ?? "لا يوجد موسم نشط"}</p>
         <h1 className="mt-2 font-display text-5xl">حرّاس القمة</h1>
         <p className="mx-auto mt-3 max-w-lg text-mist">كل حارس موثّق بأربع خطوات وله 8 مقاعد فقط في الموسم.</p>
       </div>

@@ -57,7 +57,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
             <div className="absolute -bottom-5 -left-5"><TrustSeal score={trustScore(p)} size={64} /></div>
           </div>
           <div className="flex-1 text-center md:text-right">
-            <p className="font-display text-sm tracking-[.3em] text-ice">حارس قمّة {p.verifiedAt ? "موثّق" : ""}</p>
+            <p className="font-display text-sm text-ice">حارس قمّة {p.verifiedAt ? "موثّق" : ""}</p>
             <h1 className="mt-1 font-display text-6xl tracking-wider" dir="ltr">{p.name}</h1>
             <p className="mt-2 text-lg text-mist">{p.title}</p>
             {reviews.length > 0 && (

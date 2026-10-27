@@ -56,13 +56,13 @@ export function AltitudeGauge() {
   const alt = Math.round(p * 8848);
   return (
     <div aria-hidden className="pointer-events-none fixed left-3 top-1/2 z-30 hidden -translate-y-1/2 lg:flex flex-col items-center gap-3">
-      <span className="font-display text-[10px] tracking-widest text-ice/70 [writing-mode:vertical-rl]">الارتفاع</span>
+      <span className="font-display text-[10px] text-ice/70 [writing-mode:vertical-rl]">الارتفاع</span>
       <div className="relative h-72 w-[3px] rounded bg-white/10">
-        <div className="absolute bottom-0 w-full rounded bg-gradient-to-t from-glacier via-violet to-gold" style={{ height: `${p * 100}%` }} />
+        <div className="absolute bottom-0 w-full rounded bg-gradient-to-t from-ember via-gold to-ice" style={{ height: `${p * 100}%` }} />
         {TIERS.map((_, i) => (
           <span key={i} className="absolute -left-1 h-px w-[11px] bg-white/30" style={{ bottom: `${(i / (TIERS.length - 1)) * 100}%` }} />
         ))}
-        <div className="absolute -left-[7px] h-4 w-4 rotate-45 border border-gold bg-night shadow-[0_0_14px_#ffcf6b]" style={{ bottom: `calc(${p * 100}% - 8px)` }} />
+        <div className="absolute -left-[7px] h-4 w-4 rotate-45 border border-gold bg-night shadow-[0_0_14px_#d4af37]" style={{ bottom: `calc(${p * 100}% - 8px)` }} />
       </div>
       <div className="text-center font-display leading-tight">
         <div className="text-sm text-gold">{tier}</div>

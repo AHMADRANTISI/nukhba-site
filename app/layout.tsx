@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_Arabic, Reem_Kufi } from "next/font/google";
+import { Cairo } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import SkyCanvas from "@/components/SkyCanvas";
@@ -8,8 +8,9 @@ import { getUser } from "@/lib/auth";
 import { settings } from "@/lib/core";
 import { logout } from "./actions";
 
-const kufi = Reem_Kufi({ subsets: ["arabic"], weight: ["500", "700"], variable: "--font-kufi" });
-const plex = IBM_Plex_Sans_Arabic({ subsets: ["arabic"], weight: ["400", "500", "700"], variable: "--font-plex" });
+// One clear typeface everywhere: Cairo — bold for headings, regular for text.
+const kufi = Cairo({ subsets: ["arabic", "latin"], weight: ["600", "700", "800"], variable: "--font-kufi" });
+const plex = Cairo({ subsets: ["arabic", "latin"], weight: ["400", "500", "700"], variable: "--font-plex" });
 
 export const metadata: Metadata = {
   title: "قِمّة — حرّاس الكونكر",

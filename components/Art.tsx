@@ -41,18 +41,18 @@ export function SigilRing({ total, taken, size = 92 }: { total: number; taken: n
   };
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" role="img" aria-label={`${left} حجوزات متبقية من ${total}`}>
-      <g className="spin-slow"><circle cx="50" cy="50" r="47" fill="none" stroke="#8ff3ff" strokeOpacity=".18" strokeDasharray="1 4" /></g>
+      <g className="spin-slow"><circle cx="50" cy="50" r="47" fill="none" stroke="#f1e3bf" strokeOpacity=".22" strokeDasharray="1 4" /></g>
       {Array.from({ length: total }, (_, i) => {
         const isTaken = i < taken;
         return (
           <path key={i} d={arc(i)} fill="none" strokeWidth="7" strokeLinecap="round"
-            stroke={isTaken ? "#ffcf6b" : "#8ff3ff"}
+            stroke={isTaken ? "#e6c36a" : "#f1e3bf"}
             className={isTaken ? "" : "slot-free"}
-            style={{ ["--i" as string]: i, filter: isTaken ? "drop-shadow(0 0 3px #ff8a3d)" : undefined, opacity: isTaken ? 1 : .7 }} />
+            style={{ ["--i" as string]: i, filter: isTaken ? "drop-shadow(0 0 3px #d4af37)" : undefined, opacity: isTaken ? 1 : .28 }} />
         );
       })}
-      <text x="50" y="50" textAnchor="middle" dominantBaseline="central" fill={left ? "#fff" : "#fb7185"} fontSize="22" fontWeight="700" fontFamily="var(--font-kufi)">{left}</text>
-      <text x="50" y="68" textAnchor="middle" fill="#c7cdee" fontSize="7.5" fontFamily="var(--font-plex)">{left ? "متبقي" : "مكتمل"}</text>
+      <text x="50" y="50" textAnchor="middle" dominantBaseline="central" fill={left ? "#fff6dc" : "#f08a8a"} fontSize="22" fontWeight="700" fontFamily="var(--font-kufi)">{left}</text>
+      <text x="50" y="68" textAnchor="middle" fill="#bdb3a0" fontSize="7.5" fontFamily="var(--font-plex)">{left ? "متبقي" : "مكتمل"}</text>
     </svg>
   );
 }
@@ -71,27 +71,68 @@ export function TrustSeal({ score, size = 54 }: { score: number; size?: number }
   );
 }
 
-// Layered mountain range for the hero; each ridge scrolls at a different depth.
+// Gold line-art mountain ranges that draw themselves in, with a glint on the summit.
+// Each ridge scrolls at a different depth.
+const RIDGES = [
+  { d: "M0 430 L160 330 L290 380 L470 210 L600 300 L720 90 L850 270 L990 190 L1130 330 L1270 250 L1440 380", depth: -0.08, w: 1.6, o: 1 },
+  { d: "M0 480 L140 410 L260 455 L420 345 L560 435 L690 390 L860 470 L1010 370 L1170 445 L1300 400 L1440 455", depth: -0.18, w: 1.1, o: .55 },
+  { d: "M0 545 L200 490 L380 535 L540 480 L720 545 L900 495 L1080 548 L1260 488 L1440 535", depth: -0.3, w: .9, o: .3 },
+];
+
 export function Range() {
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%]">
-      <svg viewBox="0 0 1440 600" preserveAspectRatio="xMidYMax slice" className="ridge absolute inset-0 h-full w-full" style={{ ["--depth" as string]: -0.08 }}>
-        <defs>
-          <linearGradient id="r1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#2a2f63" /><stop offset="1" stopColor="#0b0e24" /></linearGradient>
-          <radialGradient id="peakglow"><stop offset="0" stopColor="#ffcf6b" stopOpacity=".9" /><stop offset="1" stopColor="#ffcf6b" stopOpacity="0" /></radialGradient>
-        </defs>
-        <path d="M0 420 L180 300 L300 360 L470 200 L600 290 L720 70 L840 260 L980 180 L1120 320 L1260 240 L1440 380 L1440 600 L0 600Z" fill="url(#r1)" />
-        <path d="M720 70 L760 130 L742 125 L728 150 L712 118 L690 128Z" fill="#e9f6ff" opacity=".85" />
-        <circle cx="720" cy="66" r="70" fill="url(#peakglow)" className="beacon" />
-        <circle cx="720" cy="66" r="5" fill="#fff6d6" />
-      </svg>
-      <svg viewBox="0 0 1440 600" preserveAspectRatio="xMidYMax slice" className="ridge absolute inset-0 h-full w-full" style={{ ["--depth" as string]: -0.18 }}>
-        <path d="M0 470 L140 400 L260 450 L420 330 L560 430 L690 380 L860 470 L1010 360 L1170 440 L1300 390 L1440 450 L1440 600 L0 600Z" fill="#11153a" />
-      </svg>
-      <svg viewBox="0 0 1440 600" preserveAspectRatio="xMidYMax slice" className="ridge absolute inset-0 h-full w-full" style={{ ["--depth" as string]: -0.3 }}>
-        <path d="M0 540 L200 480 L380 530 L540 470 L720 540 L900 490 L1080 545 L1260 480 L1440 530 L1440 600 L0 600Z" fill="#070918" />
-      </svg>
+    <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[44%]">
+      {RIDGES.map((r, i) => (
+        <svg key={i} viewBox="0 0 1440 600" preserveAspectRatio="none" className="ridge absolute inset-0 h-full w-full" style={{ ["--depth" as string]: r.depth }}>
+          <defs>
+            <linearGradient id={`rg${i}`} x1="0" x2="1">
+              <stop offset="0" stopColor="#d4af37" stopOpacity="0" />
+              <stop offset=".5" stopColor="#f7e7b4" />
+              <stop offset="1" stopColor="#d4af37" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id={`rf${i}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#d4af37" stopOpacity={.07 * r.o} />
+              <stop offset="1" stopColor="#000" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={`${r.d} L1440 600 L0 600Z`} fill={`url(#rf${i})`} />
+          <path d={r.d} fill="none" stroke={`url(#rg${i})`} strokeWidth={r.w} vectorEffect="non-scaling-stroke" opacity={r.o}
+            className="draw-in" style={{ animationDelay: `${.3 + i * .35}s` }} />
+        </svg>
+      ))}
+      {/* summit glint sits exactly on the main peak (x 50%, y 90/600) */}
+      <div className="ridge absolute left-1/2 top-[15%] -translate-x-1/2 -translate-y-1/2" style={{ ["--depth" as string]: -0.08 }}>
+        <div className="beacon h-28 w-28 rounded-full bg-[radial-gradient(closest-side,#fff6dccc,#d4af3700)]" />
+        <svg viewBox="-40 -40 80 80" className="spin-slow absolute inset-0 m-auto h-16 w-16">
+          <path d="M0 -40 L4 -4 L40 0 L4 4 L0 40 L-4 4 L-40 0 L-4 -4Z" fill="#fff6dc" />
+        </svg>
+      </div>
+      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black to-transparent" />
     </div>
+  );
+}
+
+// Slowly counter-rotating gold rings behind the hero title, like an engraved crest.
+export function Halo() {
+  return (
+    <svg aria-hidden viewBox="0 0 600 600" className="pointer-events-none absolute -z-10 left-1/2 top-1/2 h-[min(92vw,640px)] w-[min(92vw,640px)] -translate-x-1/2 -translate-y-1/2 opacity-70">
+      <defs>
+        <linearGradient id="halo" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#f7e7b4" stopOpacity=".7" />
+          <stop offset=".5" stopColor="#d4af37" stopOpacity=".1" />
+          <stop offset="1" stopColor="#f7e7b4" stopOpacity=".5" />
+        </linearGradient>
+      </defs>
+      <g className="spin-slow"><circle cx="300" cy="300" r="290" fill="none" stroke="url(#halo)" strokeWidth=".8" strokeDasharray="1 7" /></g>
+      <g className="spin-rev"><circle cx="300" cy="300" r="250" fill="none" stroke="url(#halo)" strokeWidth="1" /></g>
+      <g className="spin-slow">
+        <circle cx="300" cy="300" r="215" fill="none" stroke="#d4af37" strokeOpacity=".25" strokeWidth=".6" strokeDasharray="60 14 4 14" />
+        {Array.from({ length: 8 }, (_, i) => {
+          const a = (i / 8) * Math.PI * 2;
+          return <path key={i} d="M0 -5 L3 0 L0 5 L-3 0Z" fill="#f7e7b4" opacity=".7" transform={`translate(${300 + Math.cos(a) * 250} ${300 + Math.sin(a) * 250})`} />;
+        })}
+      </g>
+    </svg>
   );
 }
 
@@ -101,7 +142,7 @@ export function Avatar({ name, file, size = 72 }: { name: string; file?: string 
     return <img src={`/media/avatars/${file}`} alt={name} width={size} height={size} className="rounded-2xl object-cover ring-1 ring-white/20" style={{ width: size, height: size }} />;
   }
   return (
-    <div className="grid place-items-center rounded-2xl bg-gradient-to-br from-ink to-deep font-display text-gold ring-1 ring-gold/40"
+    <div className="grid place-items-center rounded-2xl bg-gradient-to-br from-[#1a1510] to-black font-display text-gold ring-1 ring-gold/40"
       style={{ width: size, height: size, fontSize: size * .38 }}>{name.slice(0, 2)}</div>
   );
 }
