@@ -8,7 +8,9 @@
     "start": "next start -p 3400",
     "db:push": "prisma db push",
     "db:seed": "node --env-file=.env prisma/seed.mjs",
-    "setup": "prisma db push && node --env-file=.env prisma/seed.mjs"
+    "setup": "prisma db push && node --env-file=.env prisma/seed.mjs",
+    "demo": "node --env-file=.env prisma/demo.mjs",
+    "demo:clear": "node --env-file=.env prisma/demo.mjs --clear"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",
