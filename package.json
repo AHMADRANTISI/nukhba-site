@@ -10,7 +10,8 @@
     "db:seed": "node --env-file=.env prisma/seed.mjs",
     "setup": "prisma db push && node --env-file=.env prisma/seed.mjs",
     "demo": "node --env-file=.env prisma/demo.mjs",
-    "demo:clear": "node --env-file=.env prisma/demo.mjs --clear"
+    "demo:clear": "node --env-file=.env prisma/demo.mjs --clear",
+    "start:render": "node scripts/start-render.mjs"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",
@@ -28,5 +29,8 @@
     "prisma": "6.19.3",
     "tailwindcss": "4.3.3",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20.9"
   }
 }
