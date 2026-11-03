@@ -7,7 +7,7 @@ import { savePlayer } from "../../actions";
 export default async function EditPlayer({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string }> }) {
   const { id } = await params;
   const { saved } = await searchParams;
-  const p = id === "new" ? null : await db.player.findUnique({ where: { id }, include: { services: true } });
+  const p = id === "new" ? null : await db.player.findUnique({ where: { id }, include: { services: true, user: { select: { name: true, email: true, phone: true } } } });
   if (id !== "new" && !p) notFound();
   const svc = (k: string) => p?.services.find((s) => s.service === k);
 
@@ -64,6 +64,16 @@ export default async function EditPlayer({ params, searchParams }: { params: Pro
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="shard grid gap-4 p-6 sm:grid-cols-2">
+        <h2 className="font-display text-xl sm:col-span-2">حساب اللاعب</h2>
+        {p?.user ? (
+          <p className="text-sm leading-7 text-mist sm:col-span-2">يدير هذه البطاقة: <b className="text-white">{p.user.name}</b> — <span dir="ltr">{p.user.email}</span> — <span dir="ltr">{p.user.phone}</span></p>
+        ) : (
+          <p className="text-sm text-mist sm:col-span-2">لا يوجد حساب مرتبط — البطاقة تُدار من الإدارة فقط.</p>
+        )}
+        {text("accountEmail", "ربط بحساب (بريد مسجّل على الموقع)", "", { type: "email", dir: "ltr", placeholder: p?.user?.email ?? "player@email.com" })}
       </section>
 
       <section className="shard p-6">

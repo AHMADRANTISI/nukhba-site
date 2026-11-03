@@ -13,11 +13,12 @@ model User {
   email        String    @unique
   phone        String
   passwordHash String
-  role         String    @default("CUSTOMER") // CUSTOMER | ADMIN
+  role         String    @default("CUSTOMER") // CUSTOMER | PLAYER | ADMIN
   createdAt    DateTime  @default(now())
   sessions     Session[]
   bookings     Booking[]
   reviews      Review[]
+  player       Player? // set when this is a service provider (role PLAYER)
 }
 
 model Session {
@@ -31,6 +32,9 @@ model Session {
 // A verified professional booster ("حارس القمة")
 model Player {
   id             String   @id @default(cuid())
+  // The provider account that manages this profile; null for players run by the admin
+  userId         String?  @unique
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   slug           String   @unique
   name           String // in-game name
   title          String   @default("") // short tagline

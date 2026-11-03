@@ -45,3 +45,15 @@ export async function requireAdmin() {
   if (!u || u.role !== "ADMIN") redirect("/login?next=/admin");
   return u;
 }
+
+// A service provider together with the profile they manage.
+export async function requirePlayer(next = "/pro") {
+  const u = await getUser();
+  if (!u) redirect(`/login?as=pro&next=${encodeURIComponent(next)}`);
+  const player = u.role === "PLAYER" ? await db.player.findUnique({ where: { userId: u.id } }) : null;
+  if (!player) redirect(u.role === "ADMIN" ? "/admin" : "/me");
+  return { user: u, player };
+}
+
+// Where each kind of account lands after signing in.
+export const homeFor = (role: string) => (role === "ADMIN" ? "/admin" : role === "PLAYER" ? "/pro" : "/me");

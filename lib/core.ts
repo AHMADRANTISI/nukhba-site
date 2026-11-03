@@ -77,6 +77,17 @@ export function trustScore(p: { idVerified: boolean; cleanRecord: boolean; gamep
   return [p.idVerified, p.cleanRecord, p.gameplayReview, p.pledgeSigned].filter(Boolean).length;
 }
 
+// What the provider still has to fill in before the admin can publish the card.
+export function missingCardFields(p: { title: string; country: string; device: string; experienceYrs: number }, services: number) {
+  return [
+    !p.title && "الوصف القصير",
+    !p.country && "البلد",
+    !p.device && "نوع الجهاز",
+    !p.experienceYrs && "سنوات الخبرة",
+    !services && "سعر نوع رانك واحد على الأقل",
+  ].filter(Boolean) as string[];
+}
+
 // Customers' game credentials: AES-256-GCM with CRED_KEY.
 function key() {
   const k = Buffer.from(process.env.CRED_KEY || "", "base64");

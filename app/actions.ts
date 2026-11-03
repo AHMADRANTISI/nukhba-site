@@ -4,13 +4,13 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { randomBytes } from "crypto";
 import { z } from "zod";
-import { createSession, destroySession, requireUser } from "@/lib/auth";
+import { createSession, destroySession, homeFor, requireUser } from "@/lib/auth";
 import { activeSeason, db, SERVICE_KEYS, slotWhere } from "@/lib/core";
 import { saveImage } from "@/lib/upload";
 
 export type FormState = { error?: string; ok?: boolean } | null;
 
-const safeNext = (n: unknown) => (typeof n === "string" && n.startsWith("/") && !n.startsWith("//") ? n : "/me");
+const safeNext = (n: unknown, fallback = "/me") => (typeof n === "string" && n.startsWith("/") && !n.startsWith("//") ? n : fallback);
 
 export async function register(_: FormState, f: FormData): Promise<FormState> {
   const r = z.object({
@@ -27,12 +27,43 @@ export async function register(_: FormState, f: FormData): Promise<FormState> {
   redirect(safeNext(f.get("next")));
 }
 
+// A provider signs up, then fills in their card; the admin verifies before it is published.
+export async function registerPro(_: FormState, f: FormData): Promise<FormState> {
+  const r = z.object({
+    name: z.string().trim().min(2, "الاسم قصير"),
+    gameName: z.string().trim().min(2, "اكتب اسمك في اللعبة").max(24),
+    email: z.string().trim().toLowerCase().email("بريد غير صالح"),
+    phone: z.string().trim().min(6, "رقم واتساب غير صالح"),
+    password: z.string().min(8, "كلمة المرور 8 أحرف على الأقل"),
+  }).safeParse(Object.fromEntries(f));
+  if (!r.success) return { error: r.error.issues[0].message };
+  const { name, gameName, email, phone, password } = r.data;
+  if (await db.user.findUnique({ where: { email } })) return { error: "هذا البريد مسجّل مسبقاً" };
+  const base = gameName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "player";
+  let slug = base;
+  while (await db.player.findUnique({ where: { slug } })) slug = `${base}-${randomBytes(2).toString("hex")}`;
+  const u = await db.user.create({
+    data: {
+      name, email, phone, role: "PLAYER", passwordHash: await bcrypt.hash(password, 10),
+      player: { create: { slug, name: gameName, active: false, sort: 99 } },
+    },
+  });
+  await createSession(u.id);
+  redirect("/pro/profile?welcome=1");
+}
+
 export async function login(_: FormState, f: FormData): Promise<FormState> {
   const email = String(f.get("email") || "").trim().toLowerCase();
   const u = await db.user.findUnique({ where: { email } });
   if (!u || !(await bcrypt.compare(String(f.get("password") || ""), u.passwordHash))) return { error: "البريد أو كلمة المرور غير صحيحة" };
+  const asPro = f.get("as") === "pro";
+  if (asPro && u.role === "CUSTOMER") return { error: "هذا حساب عميل — استخدم «دخول العملاء»" };
+  if (!asPro && u.role === "PLAYER") return { error: "هذا حساب لاعب — استخدم «دخول اللاعبين»" };
   await createSession(u.id);
-  redirect(safeNext(f.get("next") || (u.role === "ADMIN" ? "/admin" : "/me")));
+  // A provider never lands on customer pages, and the other way round.
+  const next = f.get("next");
+  const fits = typeof next === "string" && (u.role === "ADMIN" || next.startsWith("/pro") === (u.role === "PLAYER"));
+  redirect(safeNext(fits ? next : null, homeFor(u.role)));
 }
 
 export async function logout() {
@@ -43,6 +74,7 @@ export async function logout() {
 export async function book(_: FormState, f: FormData): Promise<FormState> {
   const slug = String(f.get("slug"));
   const user = await requireUser(`/players/${slug}`);
+  if (user.role === "PLAYER") return { error: "حسابات اللاعبين لا يمكنها الحجز — سجّل بحساب عميل" };
   const r = z.object({
     service: z.enum(SERVICE_KEYS as [string, ...string[]]),
     gameName: z.string().trim().min(2, "اكتب اسمك في اللعبة"),

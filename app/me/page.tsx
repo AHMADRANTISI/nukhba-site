@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { db, fmtDate, money, SERVICES, type ServiceKey } from "@/lib/core";
 import { StatusPill } from "@/components/StatusPill";
@@ -7,6 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function MyBookings() {
   const user = await requireUser("/me");
+  if (user.role === "PLAYER") redirect("/pro");
   const bookings = await db.booking.findMany({
     where: { userId: user.id }, orderBy: { createdAt: "desc" },
     include: { player: { select: { name: true } }, season: { select: { name: true } }, review: { select: { id: true } } },

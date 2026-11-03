@@ -60,6 +60,18 @@ export async function savePlayer(f: FormData) {
   const player = id
     ? await db.player.update({ where: { id }, data: { ...data, ...(avatar ? { avatar } : {}) } })
     : await db.player.create({ data: { ...data, avatar } });
+  // Link a registered account so that person can manage this card from /pro.
+  const accountEmail = str(f, "accountEmail").toLowerCase();
+  if (accountEmail) {
+    const u = await db.user.findUnique({ where: { email: accountEmail }, include: { player: true } });
+    if (!u) throw new Error("لا يوجد حساب بهذا البريد");
+    if (u.role === "ADMIN") throw new Error("لا يمكن ربط حساب الإدارة ببطاقة لاعب");
+    if (u.player && u.player.id !== player.id) throw new Error("هذا الحساب مرتبط ببطاقة لاعب آخر");
+    await db.$transaction([
+      db.player.update({ where: { id: player.id }, data: { userId: u.id } }),
+      db.user.update({ where: { id: u.id }, data: { role: "PLAYER" } }),
+    ]);
+  }
   if (allOk && !player.verifiedAt) await db.player.update({ where: { id: player.id }, data: { verifiedAt: new Date() } });
   if (!allOk && player.verifiedAt) await db.player.update({ where: { id: player.id }, data: { verifiedAt: null } });
 

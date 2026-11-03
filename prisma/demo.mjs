@@ -78,5 +78,17 @@ for (const [i, [name, slug, service, rating, text]] of sample.entries()) {
   await db.review.create({ data: { bookingId: b.id, playerId: b.playerId, userId: u.id, rating, text, createdAt: new Date(Date.now() - (25 + i * 3) * 864e5) } });
 }
 
-console.log("Demo ready: customer" + DEMO);
+// ── a demo provider account that manages NIMR's card, with a paid booking waiting ──
+const pro = await user("نمر", "pro");
+if (pro.role !== "PLAYER") {
+  await db.user.update({ where: { id: pro.id }, data: { role: "PLAYER" } });
+  await db.player.update({ where: { slug: "nimr" }, data: { userId: pro.id } });
+}
+const fadi = await user("فادي", "customer2");
+if (!(await db.booking.count({ where: { userId: fadi.id } }))) {
+  await booking(fadi, "nimr", "ULTIMATE", "CONFIRMED", { daysAgo: 1 },
+    ["تم حجز المقعد — بانتظار إثبات الدفع خلال 24 ساعة", "تم رفع إثبات الدفع — قيد المراجعة", "الحالة: مؤكد — بانتظار البدء"]);
+}
+
+console.log("Demo ready: customer" + DEMO + " and pro" + DEMO);
 await db.$disconnect();

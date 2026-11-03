@@ -38,7 +38,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {user ? (
                 <>
                   {user.role === "ADMIN" && <Link href="/admin" className="px-2 py-1 text-gold">الإدارة</Link>}
-                  <Link href="/me" className="px-2 py-1 text-ice">حجوزاتي</Link>
+                  {user.role === "PLAYER"
+                    ? <Link href="/pro" className="px-2 py-1 text-ice">لوحة اللاعب</Link>
+                    : <Link href="/me" className="px-2 py-1 text-ice">حجوزاتي</Link>}
                   <form action={logout}><button className="px-2 py-1 text-mist/70 hover:text-rose">خروج</button></form>
                 </>
               ) : (
