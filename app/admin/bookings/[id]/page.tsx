@@ -16,7 +16,7 @@ export default async function AdminBooking({ params }: { params: Promise<{ id: s
   const rows: [string, string][] = [
     ["العميل", `${b.user.name} — ${b.user.email} — ${b.user.phone}`],
     ["تواصل", b.contact],
-    ["الحارس", b.player.name],
+    ["اللاعب", b.player.name],
     ["الخدمة", `${SERVICES[b.service as ServiceKey].name} — ${money(b.price)}`],
     ["الموسم", b.season.name],
     ["الطريقة", MODES[b.mode] ?? b.mode],

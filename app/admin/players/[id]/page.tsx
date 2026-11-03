@@ -19,7 +19,7 @@ export default async function EditPlayer({ params, searchParams }: { params: Pro
     <form action={savePlayer} className="space-y-6">
       <input type="hidden" name="id" value={p?.id ?? ""} />
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-3xl">{p ? `تعديل ${p.name}` : "حارس جديد"}</h1>
+        <h1 className="font-display text-3xl">{p ? `تعديل ${p.name}` : "لاعب جديد"}</h1>
         {saved && <span className="rounded-full bg-gold/20 px-3 py-1 text-sm text-gold">تم الحفظ</span>}
         {p && <Link href={`/players/${p.slug}`} className="text-sm text-ice">عرض الملف ↗</Link>}
       </div>
@@ -67,7 +67,7 @@ export default async function EditPlayer({ params, searchParams }: { params: Pro
       </section>
 
       <section className="shard p-6">
-        <h2 className="font-display text-xl">سجل الثقة — لا يُنشر الحارس إلا بعد اكتمال الأربعة</h2>
+        <h2 className="font-display text-xl">سجل الثقة — لا يُنشر اللاعب إلا بعد اكتمال الأربعة</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {([["idVerified", "تم التحقق من الهوية"], ["cleanRecord", "سجل نظيف بلا حظر أو غش"], ["gameplayReview", "تمت مراجعة تسجيلات لعبه"], ["pledgeSigned", "وقّع ميثاق اللعب النظيف"]] as const).map(([k, t]) => (
             <label key={k} className="flex items-center gap-3 rounded-xl border border-white/10 p-3">
@@ -78,7 +78,7 @@ export default async function EditPlayer({ params, searchParams }: { params: Pro
         <label className="mt-4 flex items-center gap-3"><input type="checkbox" name="active" defaultChecked={p?.active ?? true} className="h-5 w-5 accent-[#ffcf6b]" />منشور على الموقع</label>
       </section>
 
-      <button className="btn-summit">حفظ الحارس</button>
+      <button className="btn-summit">حفظ اللاعب</button>
     </form>
   );
 }

@@ -11,7 +11,7 @@ export default async function AdminSettings() {
     <div className="space-y-8">
       <section className="shard p-6">
         <h2 className="font-display text-2xl">المواسم</h2>
-        <p className="mt-1 text-sm text-mist">الموسم النشط هو الذي تُحسب عليه المقاعد. عند تفعيل موسم جديد تعود مقاعد كل الحرّاس فارغة.</p>
+        <p className="mt-1 text-sm text-mist">الموسم النشط هو الذي تُحسب عليه المقاعد. عند تفعيل موسم جديد تعود مقاعد كل اللاعبين فارغة.</p>
         <ul className="mt-4 space-y-2">
           {seasons.map((x) => (
             <li key={x.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-white/10 p-3">

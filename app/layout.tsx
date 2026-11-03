@@ -33,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Logo size={40} />
             </Link>
             <div className="ms-auto flex items-center gap-1 text-sm sm:gap-4">
-              <Link href="/players" className="px-2 py-1 text-mist hover:text-white">الحرّاس</Link>
+              <Link href="/players" className="px-2 py-1 text-mist hover:text-white">اللاعبين</Link>
               <Link href="/#trust" className="hidden px-2 py-1 text-mist hover:text-white sm:inline">الأمان</Link>
               {user ? (
                 <>
@@ -57,7 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <p className="mt-2 leading-7">منظومة لتنظيم اللاعبين المحترفين الموثّقين. لا غش، لا برامج خارجية، حسابك بأمان.</p>
             </div>
             <div className="space-y-2">
-              <Link href="/players" className="block hover:text-white">كل الحرّاس</Link>
+              <Link href="/players" className="block hover:text-white">كل اللاعبين</Link>
               <Link href="/#how" className="block hover:text-white">طريقة الحجز</Link>
               <Link href="/#faq" className="block hover:text-white">الأسئلة الشائعة</Link>
             </div>

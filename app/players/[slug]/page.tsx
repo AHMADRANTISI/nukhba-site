@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const p = await db.player.findUnique({ where: { slug }, select: { name: true, title: true } });
-  return p ? { title: `${p.name} — حارس النخبة`, description: p.title } : {};
+  return p ? { title: `${p.name} — لاعب النخبة`, description: p.title } : {};
 }
 
 function tiktokId(url: string) {
@@ -46,7 +46,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
-      <Link href="/players" className="text-sm text-mist hover:text-white">→ كل الحرّاس</Link>
+      <Link href="/players" className="text-sm text-mist hover:text-white">→ كل اللاعبين</Link>
 
       {/* ── DOSSIER HEADER ── */}
       <section data-reveal className="shard scanline mt-4 overflow-hidden p-6 sm:p-10">
@@ -58,7 +58,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
             <div className="absolute -bottom-5 -left-5"><TrustSeal score={trustScore(p)} size={64} /></div>
           </div>
           <div className="flex-1 text-center md:text-right">
-            <p className="font-display text-sm text-ice">حارس النخبة {p.verifiedAt ? "موثّق" : ""}</p>
+            <p className="font-display text-sm text-ice">لاعب النخبة {p.verifiedAt ? "موثّق" : ""}</p>
             <h1 className="mt-1 font-display text-6xl tracking-wider" dir="ltr">{p.name}</h1>
             <p className="mt-2 text-lg text-mist">{p.title}</p>
             {reviews.length > 0 && (
@@ -132,7 +132,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
 
           {(p.bio || p.achievements) && (
             <section data-reveal className="shard p-6">
-              <h2 className="font-display text-2xl">عن الحارس</h2>
+              <h2 className="font-display text-2xl">عن اللاعب</h2>
               {p.bio && <p className="mt-3 whitespace-pre-line leading-8 text-mist">{p.bio}</p>}
               {p.achievements && (
                 <ul className="mt-4 space-y-2">
@@ -202,7 +202,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ slug: s
                 </ul>
               </>
             ) : (
-              <p className="mt-3 text-mist">لا توجد تقييمات بعد. التقييم متاح فقط لمن أنجز الحارس حسابه — لا تقييمات وهمية.</p>
+              <p className="mt-3 text-mist">لا توجد تقييمات بعد. التقييم متاح فقط لمن أنجز اللاعب حسابه — لا تقييمات وهمية.</p>
             )}
           </section>
         </div>

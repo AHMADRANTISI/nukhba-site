@@ -24,13 +24,13 @@ export default async function MyBookings() {
             </div>
             <span className="font-display text-gold">{money(b.price)}</span>
             <StatusPill status={b.status} />
-            {b.status === "COMPLETED" && !b.review && <span className="rounded-full bg-gold px-3 py-1 text-xs text-night">★ قيّم حارسك</span>}
+            {b.status === "COMPLETED" && !b.review && <span className="rounded-full bg-gold px-3 py-1 text-xs text-night">★ قيّم لاعبك</span>}
           </Link>
         ))}
         {!bookings.length && (
           <div className="shard p-10 text-center">
             <p className="text-mist">لا توجد حجوزات بعد.</p>
-            <Link href="/players" className="btn-summit mt-5">اختر حارسك</Link>
+            <Link href="/players" className="btn-summit mt-5">اختر لاعبك</Link>
           </div>
         )}
       </div>

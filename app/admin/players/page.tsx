@@ -7,8 +7,8 @@ export default async function AdminPlayers() {
   return (
     <>
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-3xl">الحرّاس</h1>
-        <Link href="/admin/players/new" className="btn-summit">+ حارس جديد</Link>
+        <h1 className="font-display text-3xl">اللاعبين</h1>
+        <Link href="/admin/players/new" className="btn-summit">+ لاعب جديد</Link>
       </div>
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {players.map((p) => (

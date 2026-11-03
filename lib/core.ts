@@ -28,7 +28,7 @@ export const STATUS: Record<string, { label: string; tone: string }> = {
 
 // How the guardian gets into the account. QR is the only method offered now;
 // LOGIN / DUO remain only for older bookings.
-export const MODES: Record<string, string> = { QR: "دخول عبر QR", LOGIN: "دخول بكلمة المرور", DUO: "اللعب مع الحارس" };
+export const MODES: Record<string, string> = { QR: "دخول عبر QR", LOGIN: "دخول بكلمة المرور", DUO: "اللعب معاً" };
 
 // A booking holds a slot unless it is cancelled, or unpaid with no proof after 24h.
 export const HOLD_MS = 24 * 3600 * 1000;

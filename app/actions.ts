@@ -59,7 +59,7 @@ export async function book(_: FormState, f: FormData): Promise<FormState> {
   if (!season) return { error: "لا يوجد موسم مفتوح للحجز حالياً" };
   const player = await db.player.findUnique({ where: { slug }, include: { services: true } });
   const svc = player?.services.find((s) => s.service === d.service && s.enabled);
-  if (!player || !player.active || !svc) return { error: "هذه الخدمة غير متاحة لدى هذا الحارس" };
+  if (!player || !player.active || !svc) return { error: "هذه الخدمة غير متاحة لدى هذا اللاعب" };
 
   const code = "Q-" + randomBytes(3).toString("hex").toUpperCase();
   try {
@@ -75,7 +75,7 @@ export async function book(_: FormState, f: FormData): Promise<FormState> {
       });
     });
   } catch (e) {
-    if (e instanceof Error && e.message === "FULL") return { error: "للأسف اكتملت مقاعد هذا الحارس لهذا الموسم" };
+    if (e instanceof Error && e.message === "FULL") return { error: "للأسف اكتملت مقاعد هذا اللاعب لهذا الموسم" };
     throw e;
   }
   redirect(`/me/${code}`);

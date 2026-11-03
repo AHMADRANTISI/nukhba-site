@@ -40,7 +40,7 @@ export default function BookingForm({ slug, server, services }: { slug: string; 
         <QrGlyph />
         <div className="text-sm leading-7">
           <p className="font-display text-white">الدخول عبر رمز QR فقط</p>
-          <p className="text-mist">لا نطلب كلمة مرورك أبداً. عند بدء الصعود يرسل لك الحارس رمز QR على واتساب، تمسحه من داخل اللعبة فيدخل حسابك.</p>
+          <p className="text-mist">لا نطلب كلمة مرورك أبداً. عند بدء الصعود يرسل لك اللاعب رمز QR على واتساب، تمسحه من داخل اللعبة فيدخل حسابك.</p>
         </div>
       </div>
 
@@ -48,7 +48,7 @@ export default function BookingForm({ slug, server, services }: { slug: string; 
 
       <label className="flex gap-2 text-sm text-mist">
         <input type="checkbox" name="agree" className="mt-1 accent-[#ffcf6b]" />
-        أوافق على أن المقعد يُحجز 24 ساعة بانتظار إثبات الدفع، وأن الحارس ملتزم بميثاق اللعب النظيف.
+        أوافق على أن المقعد يُحجز 24 ساعة بانتظار إثبات الدفع، وأن اللاعب ملتزم بميثاق اللعب النظيف.
       </label>
 
       {state?.error && <p role="alert" className="rounded-lg bg-rose/10 p-3 text-sm text-rose">{state.error}</p>}

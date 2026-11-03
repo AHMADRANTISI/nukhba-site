@@ -40,7 +40,7 @@ export default async function AdminBookings({ searchParams }: { searchParams: Pr
 
       <div className="mt-5 overflow-x-auto">
         <table className="w-full min-w-[720px] text-sm">
-          <thead className="text-right text-mist"><tr>{["الرمز", "العميل", "الحارس", "الخدمة", "السعر", "الحالة", "التاريخ"].map((h) => <th key={h} className="p-3 font-normal">{h}</th>)}</tr></thead>
+          <thead className="text-right text-mist"><tr>{["الرمز", "العميل", "اللاعب", "الخدمة", "السعر", "الحالة", "التاريخ"].map((h) => <th key={h} className="p-3 font-normal">{h}</th>)}</tr></thead>
           <tbody>
             {bookings.map((b) => (
               <tr key={b.id} className="border-t border-white/5 hover:bg-white/5">

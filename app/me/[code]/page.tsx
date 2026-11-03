@@ -32,7 +32,7 @@ export default async function BookingPage({ params }: { params: Promise<{ code: 
           <span className="ms-auto font-display text-2xl text-gold">{money(b.price)}</span>
         </div>
         <p className="mt-2 text-mist">
-          {SERVICES[b.service as ServiceKey].name} مع الحارس <Link href={`/players/${b.player.slug}`} className="text-white underline" dir="ltr">{b.player.name}</Link>
+          {SERVICES[b.service as ServiceKey].name} مع اللاعب <Link href={`/players/${b.player.slug}`} className="text-white underline" dir="ltr">{b.player.name}</Link>
           {" · "}{b.season.name} · {MODES[b.mode] ?? b.mode}
         </p>
 
@@ -58,7 +58,7 @@ export default async function BookingPage({ params }: { params: Promise<{ code: 
           <div>
             <h2 className="font-display text-xl">الدخول عبر رمز QR</h2>
             <p className="mt-1 text-sm leading-7 text-mist">
-              سيرسل لك الحارس رمز QR على واتساب ({b.contact}). امسحه من داخل اللعبة ليدخل حسابك — لا تشارك كلمة مرورك مع أحد، ولا حتى معنا.
+              سيرسل لك اللاعب رمز QR على واتساب ({b.contact}). امسحه من داخل اللعبة ليدخل حسابك — لا تشارك كلمة مرورك مع أحد، ولا حتى معنا.
             </p>
           </div>
         </div>
@@ -91,8 +91,8 @@ export default async function BookingPage({ params }: { params: Promise<{ code: 
       )}
       {b.status === "COMPLETED" && (
         <div data-reveal className="shard mt-6 border-gold/30 p-6">
-          <h2 className="font-display text-2xl">{b.review ? "تقييمك للحارس" : "وصلت القمّة — قيّم حارسك"}</h2>
-          <p className="mt-1 text-sm text-mist">تقييمك يظهر على ملف الحارس ويساعد غيرك على الاختيار.</p>
+          <h2 className="font-display text-2xl">{b.review ? "تقييمك للاعب" : "وصلت القمّة — قيّم لاعبك"}</h2>
+          <p className="mt-1 text-sm text-mist">تقييمك يظهر على ملف اللاعب ويساعد غيرك على الاختيار.</p>
           <ReviewForm code={b.code} player={b.player.name}
             initial={b.review ? { rating: b.review.rating, text: b.review.text, hidden: b.review.hidden } : undefined} />
         </div>
